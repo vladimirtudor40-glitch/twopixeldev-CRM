@@ -4,6 +4,7 @@
  */
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
+import { DEFAULT_OFFER_TEMPLATES } from "./offer-templates";
 
 const db = new PrismaClient();
 
@@ -22,24 +23,7 @@ async function main() {
   });
   console.log(`Admin: ${admin.email}`);
 
-  const templates = [
-    {
-      name: "Esențial", setupPrice: 1500, monthlyFee: 150,
-      description: "Site de prezentare simplu + buton „Rezervă acum”.",
-      includedFeatures: ["Site de prezentare (până la 5 pagini)", "Motor de rezervări directe", "Sincronizare iCal cu Booking", "Domeniu .ro inclus în primul an"],
-    },
-    {
-      name: "Standard", setupPrice: 2500, monthlyFee: 250, isDefault: true,
-      description: "Pachetul recomandat pentru pensiuni și vile.",
-      includedFeatures: ["Site de prezentare complet, cu galerie și pagină pentru fiecare cameră", "Motor de rezervări directe", "Sincronizare iCal cu Booking și Airbnb", "Plată online cu cardul și card de vacanță", "Emailuri automate de confirmare", "Panou de administrare (PMS)"],
-    },
-    {
-      name: "Premium", setupPrice: 4000, monthlyFee: 400,
-      description: "Pentru hoteluri și unități mari.",
-      includedFeatures: ["Tot din Standard", "Site multilingv (RO / EN)", "Tarife sezoniere și coduri de reducere", "SMS automate", "Rapoarte lunare și asistență prioritară"],
-    },
-  ];
-  for (const t of templates) {
+  for (const t of DEFAULT_OFFER_TEMPLATES) {
     const existing = await db.offerTemplate.findFirst({ where: { name: t.name } });
     if (!existing) await db.offerTemplate.create({ data: { ...t, createdById: admin.id } });
   }

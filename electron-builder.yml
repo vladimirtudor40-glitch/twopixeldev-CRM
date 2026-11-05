@@ -1,0 +1,43 @@
+appId: ro.twopixeldev.crm
+productName: twopixeldev CRM
+copyright: © twopixeldev
+electronVersion: 44.9.0
+directories:
+  app: desktop/app
+  output: dist-desktop/installer
+  buildResources: desktop/build
+asar: true
+# Procesul principal e compilat într-un singur fișier; nu împachetăm node_modules din repo
+files:
+  - "**/*"
+  - "!**/node_modules/**"
+npmRebuild: false
+afterPack: desktop/after-pack.cjs
+extraResources:
+  - from: dist-desktop/resources/migrations
+    to: migrations
+    filter:
+      - "**/*"
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: desktop/build/icon.ico
+  artifactName: twopixeldev-CRM-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: twopixeldev CRM
+  uninstallDisplayName: twopixeldev CRM
+  installerLanguages:
+    - ro_RO
+  language: "1048"
+  deleteAppDataOnUninstall: false
+linux:
+  target: dir
+  icon: desktop/build/icon.png
+  category: Office

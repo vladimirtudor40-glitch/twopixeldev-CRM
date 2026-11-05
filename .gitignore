@@ -5,3 +5,7 @@ node_modules
 *.tsbuildinfo
 next-env.d.ts
 coverage
+dist-desktop
+desktop/app/main.js
+desktop/app/preload.js
+desktop/app/package.json
