@@ -1,0 +1,958 @@
+<title>twopixeldev CRM</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: sidebar de aplicație + zonă de lucru; pe telefon bara laterală devine navigație jos.
+   Un singur aspect, intenționat întunecat: paleta twopixeldev. */
+:root{
+  --navy:#0A1828;          /* albastru închis clasic, fundal */
+  --surface:#0F2236;
+  --surface-2:#14304A;
+  --line:#1F3B57;
+  --text:#E8EEF3;
+  --muted:#8EA2B6;
+  --teal:#178582;          /* turcoaz: acțiuni, stări active */
+  --teal-hi:#25A7A2;
+  --gold:#BFA181;          /* auriu: accente, câștig, MRR */
+  --gold-hi:#D7BE98;
+  --danger:#D5675E;
+  --warn:#D9A441;
+  --ok:#43B48C;
+  --f-display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --f-body:"Instrument Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--navy);color:var(--text);font-family:var(--f-body);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--navy)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--teal-hi)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:22px;font-weight:800}
+h2{font-size:16px;font-weight:700}
+h3{font-size:14px;font-weight:700}
+.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+
+/* Shell */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 14px 16px max(14px,env(safe-area-inset-left,0px));border-right:1px solid var(--line);background:linear-gradient(180deg,#0C1D30, var(--navy))}
+.brand img{width:170px;display:block}
+.brand small{display:block;margin-top:6px;color:var(--gold);font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;align-items:center;gap:10px;padding:9px 10px;border:0;background:none;border-radius:8px;color:var(--muted);text-align:left;font-weight:500}
+.nav button:hover{background:var(--surface);color:var(--text)}
+.nav button[aria-current="page"]{background:var(--surface-2);color:var(--text)}
+.nav button[aria-current="page"] svg{color:var(--gold)}
+.nav .cnt{margin-left:auto;font-size:11px;background:var(--danger);color:#fff;border-radius:10px;padding:1px 7px}
+.side .me{margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:14px;border-top:1px solid var(--line);font-size:13px}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--teal);color:#fff;font-weight:700;font-size:12px;flex:none}
+.avatar.gold{background:var(--gold);color:var(--navy)}
+main{min-width:0;padding-block:22px 40px;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px))}
+.topbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.topbar .sp{flex:1}
+.demo-pill{font-size:11px;color:var(--gold);border:1px solid #BFA18155;border-radius:20px;padding:3px 10px;letter-spacing:.04em}
+.mob-top{display:none}
+.bottomnav{display:none}
+
+/* Generic */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);padding:7px 12px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;white-space:nowrap}
+.btn:hover{border-color:var(--teal)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn.primary:hover{background:var(--teal-hi)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy)}
+.btn.ghost{background:none}
+.btn.sm{padding:4px 9px;font-size:12px}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.input,.select{background:var(--navy);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+.input:focus,.select:focus{border-color:var(--teal);outline:none}
+textarea.input{width:100%;resize:vertical}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:none;border-radius:20px;padding:4px 10px;font-size:12px;color:var(--muted);white-space:nowrap}
+.chip[aria-pressed="true"]{background:#17858222;border-color:var(--teal);color:var(--text)}
+.badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.prio{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:6px;font-weight:800;font-family:var(--f-display);font-size:12px}
+.prio.A{background:var(--gold);color:var(--navy)}
+.prio.B{background:#BFA18133;color:var(--gold-hi)}
+.prio.C{background:var(--surface-2);color:var(--muted)}
+.web{font-size:11px;padding:2px 7px;border-radius:5px;white-space:nowrap}
+.web.FARA_SITE{background:#43B48C22;color:#7FD8B4}
+.web.DOAR_PLATFORME{background:#43B48C22;color:#7FD8B4}
+.web.ARE_SITE_PROPRIU{background:var(--surface-2);color:var(--muted)}
+.web.NECUNOSCUT{background:#D9A44122;color:var(--warn)}
+.muted{color:var(--muted)}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stack{display:flex;flex-direction:column;gap:12px}
+.dnc{background:#D5675E1f;border:1px solid #D5675E66;color:#F2A49D;border-radius:8px;padding:8px 10px;font-size:13px}
+
+/* Dashboard */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.kpi .v{font-family:var(--f-display);font-size:28px;font-weight:800;margin-top:4px}
+.kpi .s{font-size:12px;color:var(--muted)}
+.kpi.mrr{border-color:#BFA18166;background:linear-gradient(135deg,#BFA18118,var(--surface) 60%)}
+.kpi.mrr .v{color:var(--gold-hi)}
+.dgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:12px}
+.funnel{display:flex;flex-direction:column;gap:7px;margin-top:12px}
+.frow{display:grid;grid-template-columns:118px minmax(0,1fr) 64px;align-items:center;gap:10px;font-size:13px}
+.fbar{height:20px;border-radius:5px;background:var(--surface-2);overflow:hidden}
+.fbar i{display:block;height:100%;border-radius:5px}
+.tasklist{display:flex;flex-direction:column}
+.task{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:10px;align-items:start;padding:9px 0;border-top:1px solid var(--line)}
+.task:first-child{border-top:0}
+.task input{margin-top:3px;accent-color:var(--teal);width:16px;height:16px}
+.task .t{font-weight:600}
+.task .l{font-size:12px;color:var(--muted)}
+.task.done .t{text-decoration:line-through;color:var(--muted)}
+.due{font-size:12px;white-space:nowrap}
+.due.late{color:var(--danger);font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.zones{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.zrow{display:grid;grid-template-columns:130px minmax(0,1fr) 34px;gap:10px;align-items:center;font-size:13px}
+.zbar{display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--surface-2)}
+svg text{fill:var(--muted);font-family:var(--f-body)}
+
+/* Lead table */
+.filters{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.searchbox{position:relative;flex:1;min-width:220px}
+.searchbox input{width:100%;padding-left:34px}
+.searchbox svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.fgroup{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fgroup .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;width:78px;flex:none}
+.views{display:flex;gap:6px;flex-wrap:wrap}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:980px}
+th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;background:#0D1F33;position:sticky;top:0;white-space:nowrap}
+th button{background:none;border:0;padding:0;color:inherit;font:inherit;letter-spacing:inherit;text-transform:inherit}
+tbody tr{cursor:pointer}
+tbody tr:hover td{background:#14304A88}
+td .nm{font-weight:600}
+td .sub{font-size:12px;color:var(--muted)}
+.cards{display:none}
+.lcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:left;width:100%}
+.count{font-size:13px;color:var(--muted);margin:0 0 8px}
+
+/* Drawer */
+.scrim{position:fixed;inset:0;background:#02080Fb3;z-index:40}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(640px,100%);background:var(--navy);border-left:1px solid var(--line);z-index:50;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
+.dhead{padding:18px 20px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:12px;background:var(--surface)}
+.dbody{overflow-y:auto;padding:16px 20px 30px;flex:1}
+.quick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.quick a,.quick button{justify-content:center}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:0 -20px 16px;padding:0 20px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 12px;color:var(--muted);font-weight:600;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button[aria-selected="true"]{color:var(--text);border-bottom-color:var(--gold)}
+.kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:7px 12px;font-size:13px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.timeline{display:flex;flex-direction:column}
+.tl{display:grid;grid-template-columns:30px minmax(0,1fr);gap:10px;padding-bottom:14px;position:relative}
+.tl::before{content:"";position:absolute;left:14px;top:28px;bottom:0;width:1px;background:var(--line)}
+.tl:last-child::before{display:none}
+.tl .ic{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--teal-hi)}
+.tl .ic.stage{color:var(--gold)}
+.tl .when{font-size:12px;color:var(--muted)}
+.tl .out{font-size:11px;padding:1px 7px;border-radius:5px;background:var(--surface-2);color:var(--muted);margin-left:6px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.form-grid label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.contact{border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.calc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.calc label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.calc .res{grid-column:1/-1;border:1px solid #BFA18155;border-radius:10px;padding:14px;background:linear-gradient(135deg,#BFA18114,transparent)}
+.big{font-family:var(--f-display);font-size:26px;font-weight:800;color:var(--gold-hi)}
+.cmp{display:grid;grid-template-columns:120px minmax(0,1fr) 90px;gap:8px;align-items:center;font-size:12px;margin-top:6px}
+.cmp .bar{height:14px;border-radius:4px}
+
+/* Kanban */
+.board{display:flex;gap:10px;overflow-x:auto;padding-bottom:12px;align-items:flex-start;scroll-snap-type:x proximity}
+.col{flex:0 0 262px;background:var(--surface);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;max-height:calc(100vh - 150px);scroll-snap-align:start}
+.col.over{border-color:var(--teal);background:#17858214}
+.colh{padding:11px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.colh .n{margin-left:auto;font-size:12px;color:var(--muted)}
+.colb{padding:8px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:60px}
+.kcard{background:var(--navy);border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:6px;cursor:grab}
+.kcard:hover{border-color:#2B5577}
+.kcard.dragging{opacity:.4}
+.kcard .nm{font-weight:600;cursor:pointer}
+.kcard .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.kcard select{font-size:12px;padding:3px 6px}
+
+/* Map */
+.mapwrap{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.map{background:#10263A;border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;height:calc(100vh - 140px);min-height:420px}
+.map svg{width:100%;height:100%;display:block;overflow:visible}
+.mapctl{position:absolute;top:10px;left:10px;display:flex;gap:6px;flex-wrap:wrap}
+.mapnote{position:absolute;bottom:8px;left:10px;right:10px;font-size:11px;color:var(--muted)}
+.pin{cursor:pointer}
+.mapside{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 140px);overflow-y:auto}
+
+/* Modal */
+.modal{position:fixed;inset:0;display:grid;place-items:center;z-index:70;background:#02080Fb3;padding:16px}
+.modal .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px;width:min(420px,100%);display:flex;flex-direction:column;gap:12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--surface-2);border:1px solid var(--teal);padding:10px 16px;border-radius:10px;z-index:80;font-weight:600;max-width:calc(100% - 32px)}
+
+/* Clients */
+.clients{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.impl{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.impl div{font-size:11px;text-align:center;padding:6px 4px;border-radius:6px;background:var(--surface-2);color:var(--muted)}
+.impl div.GATA{background:#43B48C22;color:#7FD8B4}
+.impl div.IN_LUCRU{background:#D9A44122;color:var(--warn)}
+.months{display:flex;gap:4px;flex-wrap:wrap}
+.months button{font-size:11px;border-radius:5px;padding:3px 6px;border:1px solid var(--line);background:none}
+.months button.PLATIT{background:#43B48C22;border-color:#43B48C55;color:#7FD8B4}
+.months button.NEPLATIT{background:#D5675E1f;border-color:#D5675E66;color:#F2A49D}
+
+@media (max-width:1100px){
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dgrid{grid-template-columns:minmax(0,1fr)}
+  .mapwrap{grid-template-columns:minmax(0,1fr)}
+  .mapside{max-height:none}
+}
+@media (max-width:760px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  main{padding-block:12px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+  .mob-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .mob-top img{width:132px}
+  .bottomnav{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));position:fixed;left:0;right:0;bottom:0;z-index:30;background:#0C1D30;border-top:1px solid var(--line);padding:6px max(6px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-left,0px))}
+  .bottomnav button{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;color:var(--muted);font-size:10px;padding:4px 0}
+  .bottomnav button[aria-current="page"]{color:var(--gold)}
+  .tablewrap{display:none}
+  .cards{display:flex;flex-direction:column;gap:8px}
+  .fgroup .lbl{width:100%}
+  .kv{grid-template-columns:minmax(0,1fr)}
+  .kv dt{margin-top:6px}
+  .quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid,.calc{grid-template-columns:minmax(0,1fr)}
+  .frow{grid-template-columns:92px minmax(0,1fr) 72px}
+  .topbar .demo-pill{display:none}
+  .zrow{grid-template-columns:100px minmax(0,1fr) 30px}
+  .map{height:62vh}
+  .col{flex-basis:84%}
+  .drawer{border-left:0}
+  .dhead,.dbody{padding-left:16px;padding-right:16px}
+  .tabs{margin:0 -16px 16px;padding:0 16px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .drawer{animation:slide .18s ease-out}
+  @keyframes slide{from{transform:translateX(24px);opacity:.6}to{transform:none;opacity:1}}
+}
+</style>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/htm@3.1.1/dist/htm.umd.js"></script>
+<script>
+const LOGO = "data:image/png;base64,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";
+const { useState, useMemo, useEffect, useRef } = React;
+const html = htm.bind(React.createElement);
+
+/* ---------------- Etichete ---------------- */
+const STAGES = [
+  ["NOU","Nou","#7F8FA6"],
+  ["DE_VERIFICAT","De verificat","#9C8FD0"],
+  ["CONTACTAT","Contactat","#2F8FB8"],
+  ["INTERESAT","Interesat","#178582"],
+  ["DEMO_PROGRAMAT","Demo programat","#2DB3A9"],
+  ["OFERTA_TRIMISA","Ofertă trimisă","#C7AE86"],
+  ["NEGOCIERE","Negociere","#D9A441"],
+  ["CASTIGAT","Câștigat (client)","#E0C38F"],
+  ["PIERDUT","Pierdut","#D5675E"],
+  ["REVINO_MAI_TARZIU","Revino mai târziu","#6E7F99"],
+];
+const STAGE = Object.fromEntries(STAGES.map(([k,l,c],i)=>[k,{key:k,label:l,color:c,idx:i}]));
+const LINEAR = STAGES.slice(0,8).map(s=>s[0]);
+const ZONES = {CONSTANTA:"Constanța",MAMAIA:"Mamaia",MAMAIA_NORD_NAVODARI:"Mamaia Nord / Năvodari",EFORIE_NORD:"Eforie Nord",EFORIE_SUD:"Eforie Sud",AGIGEA:"Agigea"};
+const TYPES = {HOTEL:"Hotel",PENSIUNE_VILA:"Pensiune / vilă",APARTAMENT_REGIM_HOTELIER:"Apartament regim hotelier",HOSTEL:"Hostel",CAMPING:"Camping"};
+const WEB = {ARE_SITE_PROPRIU:"Are site propriu",DOAR_PLATFORME:"Doar Booking / Facebook",FARA_SITE:"Fără site",NECUNOSCUT:"Necunoscut"};
+const LOST = {ARE_DEJA_SITE:"Are deja site",NU_VREA:"Nu vrea",PRET:"Preț",NU_RASPUNDE:"Nu răspunde",INCHIS:"Închis"};
+const ITYPE = {APEL:"Apel",WHATSAPP:"WhatsApp",EMAIL:"Email",VIZITA:"Vizită",DEMO:"Demo"};
+const OUTCOME = {FARA_RASPUNS:"Fără răspuns",DISCUTIE_POZITIVA:"Discuție pozitivă",DISCUTIE_NEUTRA:"Discuție neutră",CERE_REVENIRE:"Cere revenire",CERE_OFERTA:"Cere ofertă",DEMO_STABILIT:"Demo stabilit",REFUZ:"Refuz"};
+const CROLE = {PROPRIETAR:"Proprietar",ADMINISTRATOR:"Administrator",RECEPTIE:"Recepție"};
+const CPREF = {TELEFON:"Telefon",WHATSAPP:"WhatsApp",EMAIL:"Email",VIZITA:"Vizită"};
+const USERS = {u1:"Vladimir T.",u2:"Andreea M."};
+const ME = "u1";
+
+/* ---------------- Utilitare ---------------- */
+const strip = s => (s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const DAY = 864e5;
+const T0 = (()=>{const d=new Date();d.setHours(0,0,0,0);return d.getTime();})();
+const at = (days,h=10,m=0)=>T0+days*DAY+h*36e5+m*6e4;
+const fmtDate = t => new Date(t).toLocaleDateString("ro-RO",{day:"numeric",month:"short"});
+const fmtDT = t => new Date(t).toLocaleDateString("ro-RO",{day:"numeric",month:"short"})+", "+new Date(t).toLocaleTimeString("ro-RO",{hour:"2-digit",minute:"2-digit"});
+const rel = t => {const d=Math.round((startOfDay(t)-T0)/DAY); if(d===0)return "azi"; if(d===-1)return "ieri"; if(d===1)return "mâine"; return d<0?`acum ${-d} zile`:`peste ${d} zile`;};
+const startOfDay = t => {const d=new Date(t);d.setHours(0,0,0,0);return d.getTime();};
+const lei = n => new Intl.NumberFormat("ro-RO",{maximumFractionDigits:0}).format(Math.round(n))+" lei";
+const waLink = p => "https://wa.me/4"+p.replace(/\D/g,"");
+const mapsLink = l => "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(l.name+" "+(l.address||"")+" "+ZONES[l.zone]);
+let _id=1000; const uid = p => p+(++_id);
+
+/* ---------------- Date demo ---------------- */
+// [nume, tip, zonă, adresă, lat, lon, telefon, categorie, camere, statusSite, prioritate, etapă, responsabil, sursă, rating Google]
+const RAW = [
+ ["Vila Aqua Marin","PENSIUNE_VILA","MAMAIA","Str. Stațiunii, nr. 12",44.2551,28.6268,"0700 000 101","3 flori",14,"DOAR_PLATFORME","A","NEGOCIERE","u1","OSM + minister",4.6],
+ ["Pensiunea Lacul Albastru","PENSIUNE_VILA","MAMAIA","Aleea Siutghiol, nr. 4",44.2423,28.6245,"0700 000 102","3 flori",11,"FARA_SITE","A","DEMO_PROGRAMAT","u1","OSM",4.4],
+ ["Hotel Nautic Residence","HOTEL","MAMAIA","Bd. Mamaia, nr. 301",44.2302,28.6312,"0700 000 103","3 stele",42,"ARE_SITE_PROPRIU","C","CONTACTAT","u2","Minister",4.2],
+ ["Vila Briza Mării","PENSIUNE_VILA","MAMAIA","Str. Cazinoului, nr. 7",44.2195,28.6352,"0700 000 104","2 flori",9,"DOAR_PLATFORME","A","OFERTA_TRIMISA","u2","OSM + minister",4.7],
+ ["Apartamente Cazino View","APARTAMENT_REGIM_HOTELIER","MAMAIA","Bd. Mamaia, nr. 255",44.2133,28.6377,"0700 000 105","2 stele",6,"DOAR_PLATFORME","A","INTERESAT","u1","OSM",4.5],
+ ["Hostel Valul Verde","HOSTEL","MAMAIA","Str. Plajei, nr. 3",44.2481,28.6285,"0700 000 106","1 stea",8,"FARA_SITE","A","NOU","u2","OSM",4.0],
+ ["Vila Ovidiu Siutghiol","PENSIUNE_VILA","MAMAIA","Aleea Lacului, nr. 18",44.2365,28.6262,"","3 flori",12,"FARA_SITE","B","DE_VERIFICAT","u1","Minister",null],
+ ["Hotel Riviera Sud Mamaia","HOTEL","MAMAIA","Bd. Mamaia, nr. 140",44.2078,28.6402,"0700 000 108","4 stele",68,"ARE_SITE_PROPRIU","C","PIERDUT","u2","Minister",4.3],
+ ["Pensiunea Pescărușul Alb","PENSIUNE_VILA","MAMAIA_NORD_NAVODARI","Str. Sat Vacanță, nr. 22",44.2902,28.6309,"0700 000 109","3 flori",10,"DOAR_PLATFORME","A","CASTIGAT","u1","OSM + minister",4.8],
+ ["Vila Corsar Năvodari","PENSIUNE_VILA","MAMAIA_NORD_NAVODARI","Str. Midiei, nr. 9",44.3108,28.6355,"0700 000 110","2 flori",8,"FARA_SITE","A","CONTACTAT","u1","OSM",4.1],
+ ["Camping Ancora Nord","CAMPING","MAMAIA_NORD_NAVODARI","Zona Plajă Năvodari",44.3201,28.6399,"0700 000 111","2 stele",30,"DOAR_PLATFORME","B","NOU","u2","OSM",3.9],
+ ["Apartamente Mamaia Nord Belvedere","APARTAMENT_REGIM_HOTELIER","MAMAIA_NORD_NAVODARI","Bd. Mamaia Nord, nr. 54",44.2795,28.6292,"0700 000 112","3 stele",16,"DOAR_PLATFORME","A","REVINO_MAI_TARZIU","u2","OSM",4.6],
+ ["Vila Tomis Port","PENSIUNE_VILA","CONSTANTA","Str. Termele Romane, nr. 5",44.1733,28.6553,"0700 000 113","3 flori",7,"FARA_SITE","A","INTERESAT","u1","OSM + minister",4.9],
+ ["Hotel Peninsula Veche","HOTEL","CONSTANTA","Str. Arhiepiscopiei, nr. 14",44.1715,28.6582,"0700 000 114","3 stele",24,"ARE_SITE_PROPRIU","C","NOU","u2","Minister",4.4],
+ ["Pensiunea Cazino Faleză","PENSIUNE_VILA","CONSTANTA","Str. Remus Opreanu, nr. 2",44.1699,28.6606,"0700 000 115","2 flori",8,"DOAR_PLATFORME","A","CASTIGAT","u1","OSM",4.5],
+ ["Apartamente Tomis Nord","APARTAMENT_REGIM_HOTELIER","CONSTANTA","Bd. Tomis, nr. 260",44.1935,28.6421,"0700 000 116","2 stele",5,"NECUNOSCUT","B","DE_VERIFICAT","u2","OSM",null],
+ ["Vila Faleza Nord","PENSIUNE_VILA","CONSTANTA","Str. Soveja, nr. 31",44.1932,28.6488,"","3 flori",9,"NECUNOSCUT","B","NOU","u1","Minister",null],
+ ["Hostel Far Constanța","HOSTEL","CONSTANTA","Str. Traian, nr. 40",44.1762,28.6519,"0700 000 118","1 stea",10,"DOAR_PLATFORME","A","CONTACTAT","u2","OSM",4.2],
+ ["Vila Agigea Lagună","PENSIUNE_VILA","AGIGEA","Str. Pescarilor, nr. 6",44.0868,28.6431,"0700 000 119","2 flori",8,"FARA_SITE","B","NOU","u1","Minister",null],
+ ["Pensiunea Dunele Agigea","PENSIUNE_VILA","AGIGEA","Str. Mării, nr. 11",44.0921,28.6479,"0700 000 120","3 flori",10,"DOAR_PLATFORME","A","DE_VERIFICAT","u2","OSM",4.3],
+ ["Hotel Lac Sărat","HOTEL","EFORIE_NORD","Bd. Tudor Vladimirescu, nr. 38",44.0612,28.6305,"0700 000 121","3 stele",36,"DOAR_PLATFORME","A","OFERTA_TRIMISA","u1","OSM + minister",4.4],
+ ["Vila Nămol Techirghiol","PENSIUNE_VILA","EFORIE_NORD","Str. Nămolului, nr. 3",44.0563,28.6261,"0700 000 122","3 flori",12,"FARA_SITE","A","CONTACTAT","u1","OSM",4.6],
+ ["Pensiunea Belona Mare","PENSIUNE_VILA","EFORIE_NORD","Str. Republicii, nr. 17",44.0655,28.6378,"0700 000 123","2 flori",9,"DOAR_PLATFORME","A","NOU","u2","OSM",4.0],
+ ["Apartamente Faleza Eforie","APARTAMENT_REGIM_HOTELIER","EFORIE_NORD","Bd. Ovidiu, nr. 8",44.0594,28.6402,"0700 000 124","2 stele",4,"DOAR_PLATFORME","A","INTERESAT","u2","OSM",4.7],
+ ["Hotel Cristal Eforie","HOTEL","EFORIE_NORD","Bd. Tudor Vladimirescu, nr. 6",44.0701,28.6359,"0700 000 125","3 stele",52,"ARE_SITE_PROPRIU","C","PIERDUT","u1","Minister",4.1],
+ ["Vila Ponto Eforie Sud","PENSIUNE_VILA","EFORIE_SUD","Str. Plajei, nr. 25",44.0286,28.6466,"0700 000 126","2 flori",10,"FARA_SITE","A","DEMO_PROGRAMAT","u2","OSM",4.3],
+ ["Camping Lacul Sărat","CAMPING","EFORIE_SUD","Zona Lac Techirghiol Sud",44.0332,28.6355,"","—",40,"NECUNOSCUT","B","NOU","u1","OSM",null],
+ ["Pensiunea Delfinul Eforie","PENSIUNE_VILA","EFORIE_SUD","Str. Movila Mare, nr. 14",44.0241,28.6488,"0700 000 128","3 flori",11,"DOAR_PLATFORME","A","NEGOCIERE","u2","OSM + minister",4.5],
+];
+
+function buildLeads(){
+  const firstNames=["Mihai","Elena","Ion","Cristina","Radu","Daniela","George","Simona","Florin","Laura","Adrian","Irina"];
+  const lastNames=["Popescu","Ionescu","Stan","Dumitru","Marin","Constantin","Neagu","Tudose","Enache","Vasile","Barbu","Petcu"];
+  return RAW.map((r,i)=>{
+    const [name,type,zone,address,lat,lon,phone,cat,rooms,web,prio,stage,owner,source,rating]=r;
+    const id="L"+(i+1);
+    const slug=strip(name).replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+    const si=STAGE[stage].idx;
+    const reached = stage==="PIERDUT" ? [2,3,1][i%3] : stage==="REVINO_MAI_TARZIU" ? 3 : si;
+    const contacts = phone ? [{id:uid("c"),name:firstNames[i%12]+" "+lastNames[(i*5)%12],role:"PROPRIETAR",phone,email:"",pref:i%3===0?"WHATSAPP":"TELEFON",primary:true}] : [];
+    if(phone && i%4===1) contacts.push({id:uid("c"),name:firstNames[(i+3)%12]+" "+lastNames[(i+7)%12],role:i%2?"ADMINISTRATOR":"RECEPTIE",phone:phone.replace(/\d$/,"9"),email:"",pref:"TELEFON",primary:false});
+    // istoric etape
+    const history=[{id:uid("h"),from:null,to:"NOU",at:at(-40+i%6,9),by:"Import Excel"}];
+    let t=-34+(i%5);
+    const path = LINEAR.slice(1, Math.min(reached,6)+1);
+    if(reached>=7) path.push("NEGOCIERE","CASTIGAT");
+    else if(reached===6) path.push("NEGOCIERE");
+    let prev="NOU";
+    for(const s of path){ if(s==="NOU")continue; t+=3+(i%3); history.push({id:uid("h"),from:prev,to:s,at:at(Math.min(t,-1),11),by:USERS[owner]}); prev=s; }
+    if(stage==="PIERDUT"||stage==="REVINO_MAI_TARZIU"){ history.push({id:uid("h"),from:prev,to:stage,at:at(-2,15),by:USERS[owner]}); }
+    // interacțiuni
+    const inter=[];
+    if(si>=2 || stage==="PIERDUT" || stage==="REVINO_MAI_TARZIU"){
+      inter.push({id:uid("i"),type:"APEL",outcome:"FARA_RASPUNS",at:at(-26+(i%4),10,15),by:USERS[owner],notes:"Nu a răspuns, am lăsat SMS cu numele firmei."});
+      inter.push({id:uid("i"),type:i%2?"WHATSAPP":"APEL",outcome:"DISCUTIE_POZITIVA",at:at(-21+(i%4),12),by:USERS[owner],notes:"Lucrează doar cu Booking, plătesc 15% comision. Proprietarul e deschis să vadă o prezentare."});
+    }
+    if(si>=4 && si<=7) inter.push({id:uid("i"),type:"VIZITA",outcome:"DEMO_STABILIT",at:at(-12+(i%3),16),by:USERS[owner],notes:"Am trecut pe la recepție. Demo stabilit cu proprietarul, vrea să vadă motorul de rezervări pe telefon."});
+    if(si>=5 && si<=7) inter.push({id:uid("i"),type:"DEMO",outcome:"CERE_OFERTA",at:at(-8+(i%3),11),by:USERS[owner],notes:"Demo pe cifrele lor: ~"+(rooms*9000).toLocaleString("ro-RO")+" lei/an. I-a plăcut cardul cu economii și plata cu card de vacanță."});
+    if(si>=6 && si<=7) inter.push({id:uid("i"),type:"EMAIL",outcome:"DISCUTIE_NEUTRA",at:at(-4,9,30),by:USERS[owner],notes:"Oferta trimisă pe email. Întreabă dacă setup-ul se poate plăti în două tranșe."});
+    if(stage==="PIERDUT") inter.push({id:uid("i"),type:"APEL",outcome:"REFUZ",at:at(-2,15),by:USERS[owner],notes:"Au deja site cu motor de rezervări de la altă firmă, contract pe încă 2 ani."});
+    if(stage==="REVINO_MAI_TARZIU") inter.push({id:uid("i"),type:"APEL",outcome:"CERE_REVENIRE",at:at(-2,15),by:USERS[owner],notes:"Acum nu au timp, se ocupă de renovare. Să revenim în martie, înainte de sezon."});
+    // sarcini
+    const tasks=[];
+    const tk=(title,days,type)=>tasks.push({id:uid("t"),title,due:at(days,10),type,done:false,assignee:owner});
+    if(stage==="NOU" && prio==="A") tk("Primul apel: prezentare scurtă",(i%3)-1,"APEL");
+    if(stage==="DE_VERIFICAT") tk("Verifică pe Google Maps dacă are site și telefon",i%2?0:-2,"VERIFICARE");
+    if(stage==="CONTACTAT") tk("Sună din nou, după-amiaza",i%2?0:-1,"APEL");
+    if(stage==="INTERESAT") tk("Stabilește data pentru demo",i%2?1:0,"APEL");
+    if(stage==="DEMO_PROGRAMAT") tk("Demo la fața locului (laptop + calcul economii)",i%2?0:2,"DEMO");
+    if(stage==="OFERTA_TRIMISA") tk("Revino la ofertă",i%2?-1:1,"APEL");
+    if(stage==="NEGOCIERE") tk("Trimite oferta revizuită (setup în 2 tranșe)",0,"TRIMITE_OFERTA");
+    if(stage==="REVINO_MAI_TARZIU") tk("Revino înainte de sezon",120,"APEL");
+    const ownSite = web==="ARE_SITE_PROPRIU";
+    const lead={
+      id,name,type,zone,address,lat,lon,phone,email:phone?("rezervari@"+slug.slice(0,18)+".demo"):"",
+      category:cat,rooms,web,
+      websiteUrl: ownSite?("https://www."+slug+".demo"):"",
+      bookingUrl: web!=="FARA_SITE"&&web!=="NECUNOSCUT"?("https://www.booking.com/hotel/ro/"+slug+".html"):"",
+      facebookUrl: web==="DOAR_PLATFORME"&&i%2?("https://facebook.com/"+slug.replace(/-/g,"")):"",
+      priority:prio,stage,owner,source,rating,
+      operator: i%3===0?("SC "+name.split(" ").slice(-1)[0].toUpperCase()+" TURISM SRL"):"",
+      cui: i%3===0?"(demo)":"",
+      inMinistry: source.includes("minister"),
+      tags: [i%5===0?"vizitat pe teren":null, prio==="A"&&web==="FARA_SITE"?"fără site":null, rooms>=30?"mare":null].filter(Boolean),
+      contacts, interactions:inter.sort((a,b)=>b.at-a.at), tasks, history,
+      lostReason: stage==="PIERDUT"?(ownSite?"ARE_DEJA_SITE":"PRET"):null,
+      followUp: stage==="REVINO_MAI_TARZIU"?at(120,10):null,
+      revenue: rooms*9000,
+      doNotContact: i===16,
+      manualCheck: web==="NECUNOSCUT"?"Caută pe Google Maps: are buton „Site web”?":"",
+    };
+    if(stage==="CASTIGAT"){
+      lead.client={plan:i%2?"Standard":"Esențial",setup:i%2?2500:1800,monthly:i%2?250:190,start:at(-30-i,10),domain:slug.split("-").slice(-2).join("")+".ro",tenantSlug:slug.slice(0,20),
+        impl:{site:"GATA",motor:i%2?"GATA":"IN_LUCRU",ical:i%2?"IN_LUCRU":"NEINCEPUT",plati:"NEINCEPUT"},
+        payments:[{m:-1,status:"PLATIT"},{m:0,status:i%2?"PLATIT":"NEPLATIT"}]};
+    }
+    return lead;
+  });
+}
+
+/* ---------------- Iconițe (lucide, inline) ---------------- */
+const P = {
+  dash:"M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z",
+  list:"M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01",
+  kanban:"M6 5v11M12 5v6M18 5v14",
+  map:"M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14",
+  users:"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75",
+  phone:"M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.1 9.9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z",
+  msg:"M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5.1A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z",
+  mail:"M4 4h16v16H4zM22 6l-10 7L2 6",
+  pin:"M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0zM12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6z",
+  search:"M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35",
+  x:"M18 6 6 18M6 6l12 12",
+  check:"M20 6 9 17l-5-5",
+  flag:"M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7",
+  arrow:"M5 12h14M12 5l7 7-7 7",
+  cal:"M3 4h18v18H3zM16 2v4M8 2v4M3 10h18",
+  upload:"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12",
+  plus:"M12 5v14M5 12h14",
+  ext:"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3",
+  coins:"M8 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM18.09 10.37A6 6 0 1 1 10.34 18M7 6h1v4M16.71 13.88l.7.71-2.82 2.82",
+  task:"M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11",
+};
+const Icon = ({n,s=16}) => html`<svg width=${s} height=${s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d=${P[n]}/></svg>`;
+const ITYPE_ICON = {APEL:"phone",WHATSAPP:"msg",EMAIL:"mail",VIZITA:"pin",DEMO:"dash"};
+
+const StageBadge = ({s}) => html`<span className="badge"><i className="dot" style=${{background:STAGE[s].color}}></i>${STAGE[s].label}</span>`;
+const Prio = ({p}) => html`<span className=${"prio "+p} title=${"Prioritate "+p}>${p}</span>`;
+const Web = ({w}) => html`<span className=${"web "+w}>${WEB[w]}</span>`;
+
+/* ---------------- Aplicația ---------------- */
+function App(){
+  const [leads,setLeads]=useState(buildLeads);
+  const [view,setView]=useState(()=>{const h=location.hash.slice(1);return ["panou","leaduri","pipeline","harta","clienti"].includes(h)?h:"panou";});
+  const [openId,setOpenId]=useState(null);
+  const [openTab,setOpenTab]=useState("prezentare");
+  const [toast,setToast]=useState(null);
+  const [stageAsk,setStageAsk]=useState(null);
+  const [leadFilter,setLeadFilter]=useState(null);
+
+  useEffect(()=>{const f=()=>{const h=location.hash.slice(1); if(["panou","leaduri","pipeline","harta","clienti"].includes(h)) setView(h);}; addEventListener("hashchange",f); return ()=>removeEventListener("hashchange",f);},[]);
+  const go = v => { setView(v); try{history.replaceState(null,"","#"+v);}catch(e){} window.scrollTo(0,0); };
+  const say = m => { setToast(m); clearTimeout(say.t); say.t=setTimeout(()=>setToast(null),2600); };
+  const upd = (id,fn) => setLeads(ls=>ls.map(l=>l.id===id?fn({...l}):l));
+  const open = (id,tab="prezentare") => { setOpenId(id); setOpenTab(tab); };
+
+  const requestMove = (id,to) => {
+    const l=leads.find(x=>x.id===id); if(!l||l.stage===to) return;
+    if(to==="PIERDUT"||to==="REVINO_MAI_TARZIU"||to==="CASTIGAT") setStageAsk({id,to});
+    else doMove(id,to,{});
+  };
+  const doMove = (id,to,extra) => {
+    upd(id,l=>{
+      const h={id:uid("h"),from:l.stage,to,at:Date.now(),by:USERS[ME],note:extra.note||""};
+      l.history=[...l.history,h]; l.stage=to;
+      if(to==="PIERDUT") l.lostReason=extra.lostReason;
+      if(to==="REVINO_MAI_TARZIU"){ l.followUp=extra.followUp; l.tasks=[...l.tasks,{id:uid("t"),title:"Revino (programat din pipeline)",due:extra.followUp,type:"APEL",done:false,assignee:l.owner}]; }
+      if(to==="CASTIGAT" && !l.client){ l.client={plan:extra.plan||"Standard",setup:+extra.setup||2500,monthly:+extra.monthly||250,start:Date.now(),domain:"",tenantSlug:strip(l.name).replace(/[^a-z0-9]+/g,"-").slice(0,20),impl:{site:"NEINCEPUT",motor:"NEINCEPUT",ical:"NEINCEPUT",plati:"NEINCEPUT"},payments:[{m:0,status:"NEPLATIT"}]}; }
+      return l;
+    });
+    setStageAsk(null);
+    say(`Mutat în „${STAGE[to].label}”`);
+  };
+
+  const lead = leads.find(l=>l.id===openId);
+  const overdue = leads.reduce((n,l)=>n+l.tasks.filter(t=>!t.done && startOfDay(t.due)<T0).length,0);
+  const NAV=[["panou","Panou","dash"],["leaduri","Lead-uri","list"],["pipeline","Pipeline","kanban"],["harta","Hartă","map"],["clienti","Clienți","users"]];
+
+  return html`
+  <div className="shell">
+    <aside className="side">
+      <div className="brand"><img src=${LOGO} alt="twopixeldev"/><small>CRM vânzări</small></div>
+      <nav className="nav" aria-label="Navigare">
+        ${NAV.map(([k,l,ic])=>html`<button key=${k} aria-current=${view===k?"page":undefined} onClick=${()=>go(k)}><${Icon} n=${ic}/>${l}${k==="panou"&&overdue?html`<span className="cnt" title="Sarcini întârziate">${overdue}</span>`:null}</button>`)}
+      </nav>
+      <div className="nav">
+        <button onClick=${()=>say("Importul Excel/CSV vine în Pasul 2")}><${Icon} n="upload"/>Import Excel / CSV</button>
+      </div>
+      <div className="me"><span className="avatar gold">VT</span><div><div>${USERS[ME]}</div><div className="muted" style=${{fontSize:"11px"}}>ADMIN</div></div></div>
+    </aside>
+    <main>
+      <div className="mob-top"><img src=${LOGO} alt="twopixeldev"/><span className="demo-pill">Prototip · date demo</span></div>
+      ${view==="panou"&&html`<${Dashboard} leads=${leads} open=${open} upd=${upd} go=${go} setLeadFilter=${setLeadFilter}/>`}
+      ${view==="leaduri"&&html`<${Leads} leads=${leads} open=${open} preset=${leadFilter} clearPreset=${()=>setLeadFilter(null)}/>`}
+      ${view==="pipeline"&&html`<${Pipeline} leads=${leads} open=${open} requestMove=${requestMove}/>`}
+      ${view==="harta"&&html`<${MapView} leads=${leads} open=${open}/>`}
+      ${view==="clienti"&&html`<${Clients} leads=${leads} open=${open} upd=${upd} say=${say}/>`}
+    </main>
+  </div>
+  <nav className="bottomnav" aria-label="Navigare">
+    ${NAV.map(([k,l,ic])=>html`<button key=${k} aria-current=${view===k?"page":undefined} onClick=${()=>go(k)}><${Icon} n=${ic} s=${20}/>${l}</button>`)}
+    <button onClick=${()=>say("Importul Excel/CSV vine în Pasul 2")}><${Icon} n="upload" s=${20}/>Import</button>
+  </nav>
+  ${lead&&html`<${LeadDrawer} key=${lead.id} lead=${lead} tab=${openTab} setTab=${setOpenTab} close=${()=>setOpenId(null)} upd=${upd} requestMove=${requestMove} say=${say}/>`}
+  ${stageAsk&&html`<${StageDialog} ask=${stageAsk} lead=${leads.find(l=>l.id===stageAsk.id)} cancel=${()=>setStageAsk(null)} confirm=${extra=>doMove(stageAsk.id,stageAsk.to,extra)}/>`}
+  ${toast&&html`<div className="toast" role="status">${toast}</div>`}
+  `;
+}
+
+/* ---------------- Panou (dashboard) ---------------- */
+function Dashboard({leads,open,upd,go,setLeadFilter}){
+  const active = leads.filter(l=>!["CASTIGAT","PIERDUT"].includes(l.stage));
+  const aNotCalled = leads.filter(l=>l.priority==="A" && ["NOU","DE_VERIFICAT"].includes(l.stage) && !l.doNotContact).length;
+  const weekAgo=T0-6*DAY;
+  const allInter = leads.flatMap(l=>l.interactions);
+  const weekInter = allInter.filter(i=>i.at>=weekAgo);
+  const demos = leads.filter(l=>l.stage==="DEMO_PROGRAMAT").length;
+  const mrr = leads.filter(l=>l.client).reduce((s,l)=>s+l.client.monthly,0);
+  const clients = leads.filter(l=>l.client).length;
+  // funnel: câte lead-uri au atins fiecare etapă
+  const maxReached = l => Math.max(...l.history.map(h=>LINEAR.indexOf(h.to)).filter(x=>x>=0),0);
+  const funnel = LINEAR.map((s,i)=>({s,n:leads.filter(l=>maxReached(l)>=i).length}));
+  // zone x prioritate
+  const zoneRows = Object.keys(ZONES).map(z=>({z,A:0,B:0,C:0,...Object.fromEntries(["A","B","C"].map(p=>[p,leads.filter(l=>l.zone===z&&l.priority===p).length]))}));
+  const zmax = Math.max(...zoneRows.map(r=>r.A+r.B+r.C));
+  // activitate pe săptămâni (ultimele 8)
+  const weeks = Array.from({length:6},(_,k)=>{const end=T0+DAY-(5-k)*7*DAY, start=end-7*DAY;
+    const w=allInter.filter(i=>i.at>=start&&i.at<end);
+    return {label:fmtDate(start),apel:w.filter(i=>["APEL","WHATSAPP","EMAIL"].includes(i.type)).length,vizita:w.filter(i=>i.type==="VIZITA"||i.type==="DEMO").length,
+      oferte:leads.filter(l=>l.history.some(h=>h.to==="OFERTA_TRIMISA"&&h.at>=start&&h.at<end)).length};});
+  const tasks = leads.flatMap(l=>l.tasks.filter(t=>!t.done && startOfDay(t.due)<=T0).map(t=>({...t,lead:l}))).sort((a,b)=>a.due-b.due);
+  const late = tasks.filter(t=>startOfDay(t.due)<T0), today = tasks.filter(t=>startOfDay(t.due)===T0);
+  const toggle = (lid,tid)=>upd(lid,l=>{l.tasks=l.tasks.map(t=>t.id===tid?{...t,done:!t.done}:t);return l;});
+
+  return html`
+  <div className="topbar"><div><div className="eyebrow">${new Date().toLocaleDateString("ro-RO",{weekday:"long",day:"numeric",month:"long"})}</div><h1>Bună, Vladimir</h1></div><span className="sp"></span><span className="demo-pill">Prototip · date demo</span></div>
+  <div className="kpis">
+    <div className="kpi"><div className="eyebrow">Lead-uri în lucru</div><div className="v num">${active.length}</div><div className="s">din ${leads.length} unități în bază</div></div>
+    <div className="kpi"><div className="eyebrow">Prioritate A nesunate</div><div className="v num">${aNotCalled}</div><div className="s"><button className="btn sm ghost" style=${{padding:0,border:0,color:"var(--teal-hi)"}} onClick=${()=>{setLeadFilter("deSunat");go("leaduri");}}>Vezi lista →</button></div></div>
+    <div className="kpi"><div className="eyebrow">Contacte în ultimele 7 zile</div><div className="v num">${weekInter.length}</div><div className="s">${demos} demo-uri programate</div></div>
+    <div className="kpi mrr"><div className="eyebrow">MRR abonamente</div><div className="v num">${lei(mrr)}</div><div className="s">${clients} clienți activi · ${lei(mrr*12)} / an</div></div>
+  </div>
+  <div className="dgrid">
+    <section className="panel" aria-labelledby="h-tasks">
+      <div className="row"><h2 id="h-tasks">De făcut azi</h2><span className="sp" style=${{flex:1}}></span><span className="muted num" style=${{fontSize:"12px"}}>${late.length} întârziate · ${today.length} azi</span></div>
+      <div className="tasklist" style=${{marginTop:"8px"}}>
+        ${tasks.length===0&&html`<p className="muted">Nimic pe azi. Bun moment pentru apeluri noi din prioritatea A.</p>`}
+        ${tasks.slice(0,9).map(t=>html`<div key=${t.id} className=${"task"+(t.done?" done":"")}>
+          <input type="checkbox" id=${"tk-"+t.id} checked=${t.done} onChange=${()=>toggle(t.lead.id,t.id)} aria-label=${"Bifează: "+t.title}/>
+          <div style=${{minWidth:0}}><div className="t">${t.title}</div><button className="l" style=${{background:"none",border:0,padding:0,textAlign:"left"}} onClick=${()=>open(t.lead.id,"sarcini")}>${t.lead.name} · ${ZONES[t.lead.zone]}</button></div>
+          <span className=${"due"+(startOfDay(t.due)<T0?" late":"")}>${startOfDay(t.due)<T0?rel(t.due):"azi"}</span>
+        </div>`)}
+      </div>
+    </section>
+    <section className="panel" aria-labelledby="h-fun">
+      <h2 id="h-fun">Conversie pe etape</h2>
+      <p className="muted" style=${{margin:"4px 0 0",fontSize:"12px"}}>Câte unități au ajuns cel puțin până la fiecare etapă.</p>
+      <div className="funnel">
+        ${funnel.map((f,i)=>html`<div key=${f.s} className="frow"><span>${STAGE[f.s].label.replace(" (client)","")}</span><div className="fbar"><i style=${{width:(f.n/funnel[0].n*100)+"%",background:STAGE[f.s].color}}></i></div><span className="num muted" style=${{textAlign:"right",whiteSpace:"nowrap"}}>${f.n}${i>0?html` · ${Math.round(f.n/funnel[0].n*100)}%`:""}</span></div>`)}
+      </div>
+    </section>
+    <section className="panel" aria-labelledby="h-act">
+      <div className="row"><h2 id="h-act">Activitate pe săptămână</h2></div>
+      <div className="legend" style=${{marginTop:"6px"}}><span><i className="dot" style=${{background:"var(--teal)"}}></i>Apeluri, WhatsApp, email</span><span><i className="dot" style=${{background:"#4FD1C5"}}></i>Vizite și demo-uri</span><span><i className="dot" style=${{background:"var(--gold)"}}></i>Oferte trimise</span></div>
+      <${ActivityChart} weeks=${weeks}/>
+    </section>
+    <section className="panel" aria-labelledby="h-zone">
+      <h2 id="h-zone">Lead-uri pe zonă și prioritate</h2>
+      <div className="legend" style=${{marginTop:"6px"}}><span><i className="dot" style=${{background:"var(--gold)"}}></i>A, de sunat primii</span><span><i className="dot" style=${{background:"#8C7A5E"}}></i>B, de verificat</span><span><i className="dot" style=${{background:"#3A5470"}}></i>C, au site</span></div>
+      <div className="zones">
+        ${zoneRows.map(r=>html`<div key=${r.z} className="zrow"><span>${ZONES[r.z].replace(" / Năvodari","")}</span>
+          <div className="zbar" style=${{width:((r.A+r.B+r.C)/zmax*100)+"%"}}>
+            <i style=${{flex:r.A,background:"var(--gold)"}}></i><i style=${{flex:r.B,background:"#8C7A5E"}}></i><i style=${{flex:r.C,background:"#3A5470"}}></i>
+          </div><span className="num muted" style=${{textAlign:"right"}}>${r.A+r.B+r.C}</span></div>`)}
+      </div>
+    </section>
+  </div>`;
+}
+
+function ActivityChart({weeks}){
+  const W=520,H=190,pl=26,pb=22,pt=10;
+  const max=Math.max(4,...weeks.map(w=>w.apel+w.vizita+w.oferte));
+  const top=Math.ceil(max/2)*2;
+  const bw=(W-pl)/weeks.length;
+  const y=v=>H-pb-(v/top)*(H-pb-pt);
+  return html`<div style=${{overflowX:"auto"}}><svg viewBox=${`0 0 ${W} ${H}`} style=${{width:"100%",minWidth:"320px",display:"block",marginTop:"8px"}} role="img" aria-label="Activitate pe ultimele 6 săptămâni">
+    ${[0,top/2,top].map(v=>html`<g key=${v}><line x1=${pl} x2=${W} y1=${y(v)} y2=${y(v)} stroke="#1F3B57" stroke-width="1"/><text x=${pl-6} y=${y(v)+4} font-size="10" text-anchor="end">${v}</text></g>`)}
+    ${weeks.map((w,i)=>{const x=pl+i*bw+bw*.2, wd=bw*.6; let base=0; const seg=[["apel","#178582"],["vizita","#4FD1C5"],["oferte","#BFA181"]];
+      return html`<g key=${i}>${seg.map(([k,c])=>{const v=w[k]; if(!v) return null; const r=html`<rect key=${k} x=${x} width=${wd} y=${y(base+v)} height=${y(base)-y(base+v)} fill=${c} rx="2"><title>${v}</title></rect>`; base+=v; return r;})}
+      <text x=${x+wd/2} y=${H-6} font-size="10" text-anchor="middle">${w.label}</text></g>`;})}
+  </svg></div>`;
+}
+
+/* ---------------- Lead-uri (tabel + filtre) ---------------- */
+const SAVED = {
+  deSunat:{label:"De sunat (A, necontactate)",f:{prio:["A"],stage:["NOU","DE_VERIFICAT"],hasPhone:true}},
+  mamaiaFaraSite:{label:"Mamaia fără site",f:{zone:["MAMAIA","MAMAIA_NORD_NAVODARI"],web:["FARA_SITE","DOAR_PLATFORME"]}},
+  aleMele:{label:"Ale mele",f:{mine:true}},
+  uitate:{label:"Fără contact de 14+ zile",f:{stale:true}},
+};
+const EMPTY_F={zone:[],type:[],prio:[],web:[],stage:[],hasPhone:false,mine:false,stale:false};
+
+function Leads({leads,open,preset,clearPreset}){
+  const [q,setQ]=useState("");
+  const [f,setF]=useState(()=>preset&&SAVED[preset]?{...EMPTY_F,...SAVED[preset].f}:EMPTY_F);
+  const [activeView,setActiveView]=useState(preset||null);
+  const [sort,setSort]=useState({k:"priority",d:1});
+  useEffect(()=>{ if(preset) clearPreset(); },[]);
+  const tog=(k,v)=>{setActiveView(null);setF(o=>({...o,[k]:o[k].includes(v)?o[k].filter(x=>x!==v):[...o[k],v]}));};
+  const last = l => l.interactions.length?Math.max(...l.interactions.map(i=>i.at)):null;
+  const list = useMemo(()=>{
+    const nq=strip(q).trim();
+    let r=leads.filter(l=>{
+      if(nq){const hay=strip([l.name,l.address,l.phone,l.email,l.operator,ZONES[l.zone],...l.contacts.map(c=>c.name)].join(" ")); const hayP=hay.replace(/\s/g,""); if(!nq.split(/\s+/).every(w=>hay.includes(w)||hayP.includes(w.replace(/\s/g,"")))) return false;}
+      if(f.zone.length&&!f.zone.includes(l.zone))return false;
+      if(f.type.length&&!f.type.includes(l.type))return false;
+      if(f.prio.length&&!f.prio.includes(l.priority))return false;
+      if(f.web.length&&!f.web.includes(l.web))return false;
+      if(f.stage.length&&!f.stage.includes(l.stage))return false;
+      if(f.hasPhone&&!l.phone)return false;
+      if(f.mine&&l.owner!==ME)return false;
+      if(f.stale){const t=last(l); if(["CASTIGAT","PIERDUT","REVINO_MAI_TARZIU"].includes(l.stage)) return false; if(t&&t>T0-14*DAY) return false;}
+      return true;});
+    const val={name:l=>strip(l.name),zone:l=>ZONES[l.zone],priority:l=>l.priority+strip(l.name),stage:l=>STAGE[l.stage].idx,last:l=>-(last(l)||0),rooms:l=>-(l.rooms||0)};
+    return r.sort((a,b)=>{const A=val[sort.k](a),B=val[sort.k](b);return (A>B?1:A<B?-1:0)*sort.d;});
+  },[leads,q,f,sort]);
+  const Th=({k,children})=>html`<th aria-sort=${sort.k===k?(sort.d>0?"ascending":"descending"):"none"}><button onClick=${()=>setSort(s=>({k,d:s.k===k?-s.d:1}))}>${children}${sort.k===k?(sort.d>0?" ↑":" ↓"):""}</button></th>`;
+  const FG=({k,label,opts})=>html`<div className="fgroup" role="group" aria-label=${label}><span className="lbl">${label}</span>${Object.entries(opts).map(([v,l])=>html`<button key=${v} className="chip" aria-pressed=${f[k].includes(v)} onClick=${()=>tog(k,v)}>${l}</button>`)}</div>`;
+  const anyF = q||JSON.stringify(f)!==JSON.stringify(EMPTY_F);
+  return html`
+  <div className="topbar"><h1>Lead-uri</h1><span className="sp"></span><button className="btn"><${Icon} n="upload"/>Import</button><button className="btn primary"><${Icon} n="plus"/>Lead nou</button></div>
+  <div className="filters">
+    <div className="row">
+      <div className="searchbox"><${Icon} n="search"/><input id="q" className="input" placeholder="Caută: nume, adresă, telefon, persoană… (merge și fără diacritice)" value=${q} onInput=${e=>setQ(e.target.value)}/></div>
+    </div>
+    <div className="views" role="group" aria-label="Vederi salvate"><span className="eyebrow" style=${{alignSelf:"center",marginRight:"4px"}}>Vederi salvate</span>
+      ${Object.entries(SAVED).map(([k,v])=>html`<button key=${k} className="chip" aria-pressed=${activeView===k} onClick=${()=>{setActiveView(k);setF({...EMPTY_F,...v.f});}}>${v.label}</button>`)}
+      ${anyF&&html`<button className="chip" onClick=${()=>{setQ("");setF(EMPTY_F);setActiveView(null);}}><${Icon} n="x" s=${12}/>Șterge filtrele</button>`}
+    </div>
+    <${FG} k="zone" label="Zonă" opts=${ZONES}/>
+    <${FG} k="prio" label="Prioritate" opts=${{A:"A · de sunat primii",B:"B · de verificat",C:"C · are site"}}/>
+    <${FG} k="web" label="Status site" opts=${WEB}/>
+    <${FG} k="stage" label="Etapă" opts=${Object.fromEntries(STAGES.map(s=>[s[0],s[1]]))}/>
+    <${FG} k="type" label="Tip" opts=${TYPES}/>
+    <div className="fgroup"><span className="lbl">Altele</span>
+      <button className="chip" aria-pressed=${f.hasPhone} onClick=${()=>{setActiveView(null);setF(o=>({...o,hasPhone:!o.hasPhone}));}}>Are telefon</button>
+      <button className="chip" aria-pressed=${f.stale} onClick=${()=>{setActiveView(null);setF(o=>({...o,stale:!o.stale}));}}>Ultima interacțiune > 14 zile</button>
+      <button className="chip" aria-pressed=${f.mine} onClick=${()=>{setActiveView(null);setF(o=>({...o,mine:!o.mine}));}}>Responsabil: eu</button>
+    </div>
+  </div>
+  <p className="count num">${list.length} ${list.length===1?"unitate":"unități"}</p>
+  <div className="tablewrap"><table>
+    <thead><tr><${Th} k="priority">Pr.<//><${Th} k="name">Unitate<//><${Th} k="zone">Zonă<//><th>Site</th><${Th} k="stage">Etapă<//><th>Telefon</th><${Th} k="rooms">Camere<//><${Th} k="last">Ultima interacțiune<//><th>Responsabil</th></tr></thead>
+    <tbody>
+      ${list.map(l=>{const t=last(l); return html`<tr key=${l.id} onClick=${()=>open(l.id)} tabIndex="0" onKeyDown=${e=>e.key==="Enter"&&open(l.id)}>
+        <td><${Prio} p=${l.priority}/></td>
+        <td><div className="nm">${l.name}${l.doNotContact&&html` <span className="web" style=${{background:"#D5675E22",color:"#F2A49D"}}>Nu mai contacta</span>`}</div><div className="sub">${TYPES[l.type]} · ${l.category}</div></td>
+        <td>${ZONES[l.zone]}</td>
+        <td><${Web} w=${l.web}/></td>
+        <td><${StageBadge} s=${l.stage}/></td>
+        <td className="num">${l.phone||html`<span className="muted">—</span>`}</td>
+        <td className="num">${l.rooms}</td>
+        <td>${t?html`<span className=${t<T0-14*DAY?"due late":""}>${rel(t)}</span>`:html`<span className="muted">niciodată</span>`}</td>
+        <td><span className="row"><span className=${"avatar"+(l.owner===ME?" gold":"")} style=${{width:"22px",height:"22px",fontSize:"10px"}}>${USERS[l.owner].split(" ").map(x=>x[0]).join("")}</span></span></td>
+      </tr>`;})}
+    </tbody></table></div>
+  <div className="cards">
+    ${list.map(l=>html`<button key=${l.id} className="lcard" onClick=${()=>open(l.id)}>
+      <div className="row" style=${{flexWrap:"nowrap"}}><${Prio} p=${l.priority}/><b style=${{flex:1,minWidth:0}}>${l.name}</b><${StageBadge} s=${l.stage}/></div>
+      <div className="row muted" style=${{fontSize:"12px"}}>${ZONES[l.zone]} · ${TYPES[l.type]} · <${Web} w=${l.web}/></div>
+    </button>`)}
+  </div>`;
+}
+
+/* ---------------- Fișa lead-ului ---------------- */
+function LeadDrawer({lead:l,tab,setTab,close,upd,requestMove,say}){
+  useEffect(()=>{const k=e=>e.key==="Escape"&&close(); addEventListener("keydown",k); document.body.style.overflow="hidden"; return ()=>{removeEventListener("keydown",k); document.body.style.overflow="";};},[]);
+  const primary = l.contacts.find(c=>c.primary)||l.contacts[0];
+  const phone = primary?.phone||l.phone;
+  const dnc=l.doNotContact;
+  const TABS=[["prezentare","Prezentare"],["contacte",`Contacte (${l.contacts.length})`],["istoric","Istoric"],["sarcini",`Sarcini (${l.tasks.filter(t=>!t.done).length})`],["oferta","Ofertă"]];
+  return html`
+  <div className="scrim" onClick=${close}></div>
+  <aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="ld-title">
+    <div className="dhead">
+      <div className="row" style=${{alignItems:"flex-start",flexWrap:"nowrap"}}>
+        <div style=${{flex:1,minWidth:0}}>
+          <div className="row" style=${{marginBottom:"4px"}}><${Prio} p=${l.priority}/><span className="muted" style=${{fontSize:"12px"}}>${TYPES[l.type]} · ${l.category} · ${l.rooms} camere</span></div>
+          <h1 id="ld-title" style=${{fontSize:"20px"}}>${l.name}</h1>
+          <div className="muted" style=${{fontSize:"13px",marginTop:"2px"}}>${l.address}, ${ZONES[l.zone]}</div>
+        </div>
+        <button className="btn ghost sm" onClick=${close} aria-label="Închide fișa"><${Icon} n="x"/></button>
+      </div>
+      ${dnc?html`<div className="dnc"><b>Nu mai contacta.</b> Unitatea a cerut să nu mai fie contactată. Butoanele de contact sunt dezactivate și lead-ul e exclus din campanii.</div>`:html`
+      <div className="quick">
+        <a className="btn primary" href=${phone?"tel:"+phone.replace(/\s/g,""):undefined} disabled=${!phone}><${Icon} n="phone"/>Sună</a>
+        <a className="btn" href=${phone?waLink(phone):undefined} target="_blank" rel="noopener" disabled=${!phone}><${Icon} n="msg"/>WhatsApp</a>
+        <a className="btn" href=${l.email?"mailto:"+l.email:undefined} disabled=${!l.email}><${Icon} n="mail"/>Email</a>
+        <a className="btn" href=${mapsLink(l)} target="_blank" rel="noopener"><${Icon} n="pin"/>Google Maps</a>
+      </div>`}
+      ${phone&&!dnc&&html`<div className="muted num" style=${{fontSize:"12px",marginTop:"-4px"}}>Telefon: <span style=${{color:"var(--text)",userSelect:"all"}}>${phone}</span>${primary?` · ${primary.name}, ${CROLE[primary.role].toLowerCase()}, preferă ${CPREF[primary.pref].toLowerCase()}`:""}</div>`}
+      <div className="row">
+        <label className="muted" htmlFor="stage-sel" style=${{fontSize:"12px"}}>Etapă</label>
+        <select id="stage-sel" className="select" value=${l.stage} onChange=${e=>requestMove(l.id,e.target.value)}>${STAGES.map(s=>html`<option key=${s[0]} value=${s[0]}>${s[1]}</option>`)}</select>
+        <span className="muted" style=${{fontSize:"12px"}}>Responsabil: ${USERS[l.owner]}</span>
+      </div>
+    </div>
+    <div className="dbody">
+      <div className="tabs" role="tablist">${TABS.map(([k,lb])=>html`<button key=${k} role="tab" aria-selected=${tab===k} onClick=${()=>setTab(k)}>${lb}</button>`)}</div>
+      ${tab==="prezentare"&&html`<${LeadOverview} l=${l} upd=${upd} say=${say}/>`}
+      ${tab==="contacte"&&html`<${LeadContacts} l=${l}/>`}
+      ${tab==="istoric"&&html`<${LeadHistory} l=${l} upd=${upd} say=${say}/>`}
+      ${tab==="sarcini"&&html`<${LeadTasks} l=${l} upd=${upd} say=${say}/>`}
+      ${tab==="oferta"&&html`<${SavingsCalc} l=${l} say=${say}/>`}
+    </div>
+  </aside>`;
+}
+
+const LinkOr = ({u,label}) => u?html`<a href=${u} target="_blank" rel="noopener">${label||u.replace(/^https?:\/\/(www\.)?/,"")}</a>`:html`<span className="muted">—</span>`;
+function LeadOverview({l,upd,say}){
+  return html`<div className="stack">
+    ${l.stage==="PIERDUT"&&html`<div className="dnc">Pierdut: ${LOST[l.lostReason]}</div>`}
+    ${l.stage==="REVINO_MAI_TARZIU"&&html`<div className="panel" style=${{padding:"10px 12px"}}>Revino pe <b>${new Date(l.followUp).toLocaleDateString("ro-RO",{day:"numeric",month:"long",year:"numeric"})}</b></div>`}
+    ${l.manualCheck&&html`<div className="panel" style=${{padding:"10px 12px",borderColor:"#D9A44166"}}><span className="eyebrow" style=${{color:"var(--warn)"}}>Verificare manuală</span><div>${l.manualCheck}</div></div>`}
+    <dl className="kv">
+      <dt>Status site</dt><dd><${Web} w=${l.web}/></dd>
+      <dt>Site propriu</dt><dd><${LinkOr} u=${l.websiteUrl}/></dd>
+      <dt>Booking</dt><dd><${LinkOr} u=${l.bookingUrl} label="Pagina pe Booking.com"/></dd>
+      <dt>Facebook / Instagram</dt><dd><${LinkOr} u=${l.facebookUrl}/></dd>
+      <dt>Rating Google</dt><dd className="num">${l.rating?l.rating+" / 5":html`<span className="muted">—</span>`}</dd>
+      <dt>Email</dt><dd>${l.email||html`<span className="muted">—</span>`}</dd>
+      <dt>Operator</dt><dd>${l.operator?html`${l.operator} <span className="muted">· CUI ${l.cui}</span>`:html`<span className="muted">—</span>`}</dd>
+      <dt>În lista ministerului</dt><dd>${l.inMinistry?"Da":"Nu"}</dd>
+      <dt>Sursă</dt><dd>${l.source}</dd>
+      <dt>Coordonate</dt><dd className="num">${l.lat.toFixed(4)}, ${l.lon.toFixed(4)}</dd>
+      <dt>Etichete</dt><dd className="row">${l.tags.length?l.tags.map(t=>html`<span key=${t} className="chip" style=${{cursor:"default"}}>${t}</span>`):html`<span className="muted">—</span>`}</dd>
+    </dl>
+    <div className="row" style=${{marginTop:"6px"}}>
+      <button className="btn sm" onClick=${()=>{upd(l.id,x=>({...x,doNotContact:!x.doNotContact}));say(l.doNotContact?"Opt-out anulat":"Marcat „Nu mai contacta”");}}><${Icon} n="flag" s=${14}/>${l.doNotContact?"Anulează „Nu mai contacta”":"Marchează „Nu mai contacta”"}</button>
+    </div>
+  </div>`;
+}
+
+function LeadContacts({l}){
+  if(!l.contacts.length) return html`<p className="muted">Încă nu avem persoane de contact. După primul apel, adaugă proprietarul sau administratorul.</p>`;
+  return html`<div className="stack">${l.contacts.map(c=>html`<div key=${c.id} className="contact">
+    <div className="row"><b>${c.name}</b><span className="chip" style=${{cursor:"default"}}>${CROLE[c.role]}</span>${c.primary&&html`<span className="muted" style=${{fontSize:"12px"}}>contact principal</span>`}</div>
+    <div className="muted num" style=${{fontSize:"13px"}}>${c.phone} · preferă ${CPREF[c.pref].toLowerCase()}</div>
+    ${!l.doNotContact&&html`<div className="row"><a className="btn sm" href=${"tel:"+c.phone.replace(/\s/g,"")}><${Icon} n="phone" s=${14}/>Sună</a><a className="btn sm" href=${waLink(c.phone)} target="_blank" rel="noopener"><${Icon} n="msg" s=${14}/>WhatsApp</a></div>`}
+  </div>`)}<button className="btn sm" style=${{alignSelf:"flex-start"}}><${Icon} n="plus" s=${14}/>Adaugă persoană</button></div>`;
+}
+
+function LeadHistory({l,upd,say}){
+  const [type,setType]=useState("APEL"); const [out,setOut]=useState("DISCUTIE_POZITIVA"); const [notes,setNotes]=useState(""); const [next,setNext]=useState("");
+  const items=[...l.interactions.map(i=>({...i,kind:"i"})),...l.history.map(h=>({...h,kind:"h"}))].sort((a,b)=>b.at-a.at);
+  const save=()=>{
+    upd(l.id,x=>{x.interactions=[{id:uid("i"),type,outcome:out,at:Date.now(),by:USERS[ME],notes:notes||"(fără notițe)"},...x.interactions];
+      if(next){x.tasks=[...x.tasks,{id:uid("t"),title:(out==="CERE_OFERTA"?"Trimite oferta":"Revino")+" după "+ITYPE[type].toLowerCase(),due:at(+next,10),type:"APEL",done:false,assignee:ME}];}
+      return x;});
+    setNotes(""); setNext(""); say(next?"Interacțiune salvată și sarcină creată":"Interacțiune salvată");
+  };
+  return html`<div className="stack">
+    ${!l.doNotContact&&html`<div className="panel stack" style=${{gap:"8px"}}>
+      <h3>Notează o interacțiune</h3>
+      <div className="form-grid">
+        <label>Tip<select id="i-type" className="select" value=${type} onChange=${e=>setType(e.target.value)}>${Object.entries(ITYPE).map(([k,v])=>html`<option key=${k} value=${k}>${v}</option>`)}</select></label>
+        <label>Rezultat<select id="i-out" className="select" value=${out} onChange=${e=>setOut(e.target.value)}>${Object.entries(OUTCOME).map(([k,v])=>html`<option key=${k} value=${k}>${v}</option>`)}</select></label>
+      </div>
+      <textarea id="i-notes" className="input" rows="2" placeholder="Ce s-a discutat?" value=${notes} onInput=${e=>setNotes(e.target.value)}></textarea>
+      <div className="row"><label className="muted" htmlFor="i-next" style=${{fontSize:"12px"}}>Sarcină următoare</label>
+        <select id="i-next" className="select" value=${next} onChange=${e=>setNext(e.target.value)}><option value="">fără</option><option value="1">mâine</option><option value="3">peste 3 zile</option><option value="7">peste o săptămână</option></select>
+        <span style=${{flex:1}}></span><button className="btn primary sm" onClick=${save}>Salvează</button></div>
+    </div>`}
+    <div className="timeline">
+      ${items.map(it=>it.kind==="i"?html`<div key=${it.id} className="tl"><span className="ic"><${Icon} n=${ITYPE_ICON[it.type]} s=${14}/></span><div style=${{minWidth:0}}>
+          <div><b>${ITYPE[it.type]}</b>${it.outcome&&html`<span className="out">${OUTCOME[it.outcome]}</span>`}</div>
+          <div className="when">${fmtDT(it.at)} · ${it.by}</div><div style=${{marginTop:"3px"}}>${it.notes}</div></div></div>`
+        :html`<div key=${it.id} className="tl"><span className="ic stage"><${Icon} n="arrow" s=${14}/></span><div>
+          <div>${it.from?html`<span className="muted">${STAGE[it.from].label}</span> → `:"Adăugat ca "}<b>${STAGE[it.to].label}</b></div>
+          <div className="when">${fmtDT(it.at)} · ${it.by}</div></div></div>`)}
+    </div></div>`;
+}
+
+function LeadTasks({l,upd,say}){
+  const [title,setTitle]=useState(""); const [days,setDays]=useState("1");
+  const add=()=>{ if(!title.trim()) return; upd(l.id,x=>({...x,tasks:[...x.tasks,{id:uid("t"),title,due:at(+days,10),type:"APEL",done:false,assignee:ME}]})); setTitle(""); say("Sarcină adăugată"); };
+  const tasks=[...l.tasks].sort((a,b)=>a.done-b.done||a.due-b.due);
+  return html`<div className="stack">
+    <div className="row"><input id="t-new" className="input" style=${{flex:1,minWidth:"180px"}} placeholder="ex. Sună din nou marți" value=${title} onInput=${e=>setTitle(e.target.value)} onKeyDown=${e=>e.key==="Enter"&&add()}/>
+      <select id="t-days" className="select" value=${days} onChange=${e=>setDays(e.target.value)}><option value="0">azi</option><option value="1">mâine</option><option value="3">peste 3 zile</option><option value="7">peste o săptămână</option></select>
+      <button className="btn primary sm" onClick=${add}>Adaugă</button></div>
+    <div className="tasklist">${tasks.length?tasks.map(t=>html`<div key=${t.id} className=${"task"+(t.done?" done":"")}>
+      <input type="checkbox" id=${"lt-"+t.id} checked=${t.done} onChange=${()=>upd(l.id,x=>({...x,tasks:x.tasks.map(y=>y.id===t.id?{...y,done:!y.done}:y)}))} aria-label=${"Bifează: "+t.title}/>
+      <div><div className="t">${t.title}</div><div className="l">${USERS[t.assignee]}</div></div>
+      <span className=${"due"+(!t.done&&startOfDay(t.due)<T0?" late":"")}>${fmtDate(t.due)} · ${rel(t.due)}</span></div>`):html`<p className="muted">Nicio sarcină.</p>`}</div>
+  </div>`;
+}
+
+/* ---------------- Calculator de economii ---------------- */
+function savings({revenue,bookingShare,commission,moved,setup,monthly}){
+  const viaBooking = revenue*bookingShare/100;
+  const saved = viaBooking*moved/100*commission/100;
+  const cost1 = setup+12*monthly, costN=12*monthly;
+  const perMonth = saved/12-monthly;
+  return {viaBooking,saved,cost1,costN,net1:saved-cost1,netN:saved-costN,payback:perMonth>0?setup/perMonth:null,commissionTotal:viaBooking*commission/100};
+}
+function SavingsCalc({l,say}){
+  const [v,setV]=useState({revenue:l.revenue,bookingShare:70,commission:15,moved:25,setup:2500,monthly:250});
+  const r=savings(v);
+  const F=({k,label,suf,step=1})=>html`<label>${label}<div className="row" style=${{flexWrap:"nowrap"}}><input id=${"calc-"+k} className="input num" type="number" step=${step} value=${v[k]} style=${{width:"100%"}} onInput=${e=>setV(o=>({...o,[k]:+e.target.value||0}))}/><span className="muted">${suf}</span></div></label>`;
+  const max=Math.max(r.saved,r.cost1,1);
+  return html`<div className="stack">
+    <p className="muted" style=${{margin:0}}>Calculul pentru demo și pentru oferta PDF, pe cifrele unității. Booking rămâne vitrina. Mutăm pe direct doar o parte din rezervări.</p>
+    <div className="calc">
+      <${F} k="revenue" label="Încasări anuale estimate" suf="lei" step="1000"/>
+      <${F} k="bookingShare" label="Cât vine azi prin Booking" suf="%"/>
+      <${F} k="commission" label="Comision Booking" suf="%"/>
+      <${F} k="moved" label="Rezervări mutate pe direct" suf="%"/>
+      <${F} k="setup" label="Setup (o dată)" suf="lei" step="100"/>
+      <${F} k="monthly" label="Abonament" suf="lei/lună" step="10"/>
+      <div className="res">
+        <div className="eyebrow">Comision Booking economisit pe an</div>
+        <div className="big num">${lei(r.saved)}</div>
+        <div className="muted" style=${{fontSize:"12px"}}>Azi plătesc ${lei(r.commissionTotal)} / an comision pe ${lei(r.viaBooking)} încasări prin Booking.</div>
+        <div className="cmp"><span>Economie / an</span><div className="bar" style=${{width:(r.saved/max*100)+"%",background:"var(--gold)"}}></div><span className="num">${lei(r.saved)}</span></div>
+        <div className="cmp"><span>Costul nostru, anul 1</span><div className="bar" style=${{width:(r.cost1/max*100)+"%",background:"var(--teal)"}}></div><span className="num">${lei(r.cost1)}</span></div>
+        <div className="cmp"><span>Din anul 2</span><div className="bar" style=${{width:(r.costN/max*100)+"%",background:"#2B5577"}}></div><span className="num">${lei(r.costN)}</span></div>
+        <div className="row" style=${{marginTop:"12px",gap:"18px"}}>
+          <div><div className="eyebrow">Câștig net anul 1</div><b className="num" style=${{color:r.net1>=0?"var(--ok)":"var(--danger)"}}>${lei(r.net1)}</b></div>
+          <div><div className="eyebrow">Din anul 2</div><b className="num" style=${{color:r.netN>=0?"var(--ok)":"var(--danger)"}}>${lei(r.netN)} / an</b></div>
+          <div><div className="eyebrow">Setup recuperat în</div><b className="num">${r.payback?Math.ceil(r.payback)+" luni":"—"}</b></div>
+        </div>
+      </div>
+    </div>
+    <div className="row"><button className="btn gold" onClick=${()=>say("Generarea PDF a ofertei vine în Pasul 4")}><${Icon} n="coins"/>Generează oferta PDF</button><span className="muted" style=${{fontSize:"12px"}}>Șablon: Standard · valabilă 30 de zile</span></div>
+  </div>`;
+}
+
+/* ---------------- Pipeline (Kanban) ---------------- */
+function Pipeline({leads,open,requestMove}){
+  const [over,setOver]=useState(null); const [drag,setDrag]=useState(null);
+  const [mine,setMine]=useState(false);
+  const shown = leads.filter(l=>!mine||l.owner===ME);
+  return html`
+  <div className="topbar"><h1>Pipeline</h1><span className="muted" style=${{fontSize:"13px"}}>Trage cardurile între coloane. Pe telefon, folosește „Mută în…”.</span><span className="sp"></span>
+    <button className="chip" aria-pressed=${mine} onClick=${()=>setMine(m=>!m)}>Doar ale mele</button></div>
+  <div className="board">
+    ${STAGES.map(([k,label,color])=>{const items=shown.filter(l=>l.stage===k);
+      const value = k==="CASTIGAT"?items.reduce((s,l)=>s+(l.client?.monthly||0),0):0;
+      return html`<section key=${k} className=${"col"+(over===k?" over":"")} aria-label=${label}
+        onDragOver=${e=>{e.preventDefault();setOver(k);}} onDragLeave=${()=>setOver(o=>o===k?null:o)}
+        onDrop=${e=>{e.preventDefault();setOver(null);const id=e.dataTransfer.getData("text/plain");if(id)requestMove(id,k);}}>
+        <div className="colh"><i className="dot" style=${{background:color}}></i><h3>${label}</h3><span className="n num">${items.length}${value?` · ${lei(value)}/lună`:""}</span></div>
+        <div className="colb">
+          ${items.map(l=>{const nt=l.tasks.filter(t=>!t.done).sort((a,b)=>a.due-b.due)[0];
+            return html`<article key=${l.id} className=${"kcard"+(drag===l.id?" dragging":"")} draggable="true"
+            onDragStart=${e=>{e.dataTransfer.setData("text/plain",l.id);setDrag(l.id);}} onDragEnd=${()=>setDrag(null)}>
+            <div className="row" style=${{flexWrap:"nowrap"}}><${Prio} p=${l.priority}/><span className="nm" role="button" tabIndex="0" onClick=${()=>open(l.id)} onKeyDown=${e=>e.key==="Enter"&&open(l.id)}>${l.name}</span></div>
+            <div className="meta">${ZONES[l.zone]} · ${l.rooms} cam. · <${Web} w=${l.web}/></div>
+            ${nt&&html`<div className="meta" style=${{flexWrap:"nowrap",alignItems:"flex-start"}}><${Icon} n="cal" s=${12}/><span style=${{minWidth:0}} className=${startOfDay(nt.due)<T0?"due late":""}>${nt.title} · ${rel(nt.due)}</span></div>`}
+            ${k==="PIERDUT"&&l.lostReason&&html`<div className="meta" style=${{color:"#F2A49D"}}>${LOST[l.lostReason]}</div>`}
+            ${k==="REVINO_MAI_TARZIU"&&l.followUp&&html`<div className="meta">Revino ${fmtDate(l.followUp)}</div>`}
+            <select className="select" aria-label=${"Mută "+l.name+" în"} value="" onChange=${e=>e.target.value&&requestMove(l.id,e.target.value)}>
+              <option value="">Mută în…</option>${STAGES.filter(s=>s[0]!==k).map(s=>html`<option key=${s[0]} value=${s[0]}>${s[1]}</option>`)}
+            </select>
+          </article>`;})}
+        </div></section>`;})}
+  </div>`;
+}
+
+function StageDialog({ask,lead,cancel,confirm}){
+  const [reason,setReason]=useState("NU_RASPUNDE"); const [days,setDays]=useState(90); const [note,setNote]=useState("");
+  const [plan,setPlan]=useState("Standard"); const [setup,setSetup]=useState(2500); const [monthly,setMonthly]=useState(250);
+  return html`<div className="modal" role="dialog" aria-modal="true" aria-labelledby="sd-t"><div className="box">
+    <h2 id="sd-t">${lead.name} → ${STAGE[ask.to].label}</h2>
+    ${ask.to==="PIERDUT"&&html`<label className="stack" style=${{gap:"4px"}}><span className="muted" style=${{fontSize:"12px"}}>Motiv</span><select id="sd-reason" className="select" value=${reason} onChange=${e=>setReason(e.target.value)}>${Object.entries(LOST).map(([k,v])=>html`<option key=${k} value=${k}>${v}</option>`)}</select></label>`}
+    ${ask.to==="REVINO_MAI_TARZIU"&&html`<label className="stack" style=${{gap:"4px"}}><span className="muted" style=${{fontSize:"12px"}}>Revino peste</span><select id="sd-days" className="select" value=${days} onChange=${e=>setDays(+e.target.value)}><option value="14">2 săptămâni</option><option value="30">o lună</option><option value="90">3 luni</option><option value="120">4 luni (înainte de sezon)</option></select><span className="muted" style=${{fontSize:"12px"}}>Se creează automat o sarcină pe ${fmtDate(at(days))}.</span></label>`}
+    ${ask.to==="CASTIGAT"&&html`<div className="form-grid">
+      <label>Plan<select id="sd-plan" className="select" value=${plan} onChange=${e=>setPlan(e.target.value)}><option>Esențial</option><option>Standard</option><option>Premium</option></select></label>
+      <label>Setup (lei)<input id="sd-setup" className="input num" type="number" value=${setup} onInput=${e=>setSetup(e.target.value)}/></label>
+      <label>Abonament (lei/lună)<input id="sd-monthly" className="input num" type="number" value=${monthly} onInput=${e=>setMonthly(e.target.value)}/></label>
+    </div><p className="muted" style=${{margin:0,fontSize:"12px"}}>Se creează fișa de client, abonamentul și prima plată.</p>`}
+    <textarea id="sd-note" className="input" rows="2" placeholder="Notă (opțional)" value=${note} onInput=${e=>setNote(e.target.value)}></textarea>
+    <div className="row" style=${{justifyContent:"flex-end"}}><button className="btn ghost" onClick=${cancel}>Renunță</button>
+      <button className="btn primary" onClick=${()=>confirm({lostReason:reason,followUp:at(days),note,plan,setup,monthly})}>Mută</button></div>
+  </div></div>`;
+}
+
+/* ---------------- Hartă ---------------- */
+// Contur aproximativ al litoralului (lat, lon), de la nord la sud. În aplicație: Leaflet + OpenStreetMap.
+const COAST=[[44.36,28.648],[44.33,28.641],[44.31,28.636],[44.29,28.633],[44.27,28.631],[44.25,28.632],[44.235,28.635],[44.22,28.639],[44.205,28.644],[44.19,28.651],[44.18,28.656],[44.172,28.662],[44.166,28.666],[44.158,28.664],[44.15,28.668],[44.14,28.672],[44.13,28.668],[44.115,28.662],[44.1,28.655],[44.085,28.651],[44.07,28.645],[44.058,28.644],[44.045,28.645],[44.03,28.65],[44.01,28.654],[43.99,28.656]];
+const VIEWS={tot:{label:"Tot litoralul",lat:[43.995,44.33],lon:[28.56,28.71]},nord:{label:"Mamaia și Năvodari",lat:[44.195,44.33],lon:[28.58,28.68]},cta:{label:"Constanța",lat:[44.155,44.205],lon:[28.615,28.68]},sud:{label:"Agigea și Eforie",lat:[44.015,44.1],lon:[28.6,28.67]}};
+function MapView({leads,open}){
+  const [vk,setVk]=useState("nord"); const [sel,setSel]=useState(null); const [zoneF,setZoneF]=useState("");
+  const V=VIEWS[vk]; const k=Math.cos(44.15*Math.PI/180);
+  const W=1000, H=Math.round(W*(V.lat[1]-V.lat[0])/((V.lon[1]-V.lon[0])*k));
+  const px=(lat,lon)=>[(lon-V.lon[0])/(V.lon[1]-V.lon[0])*W,(V.lat[1]-lat)/(V.lat[1]-V.lat[0])*H];
+  const sea="M"+COAST.map(([a,b])=>px(a,b).join(",")).join(" L")+` L${W+6000},${H+6000} L${W+6000},-6000 Z`;
+  const ell=(lat,lon,rl,ro)=>{const [cx,cy]=px(lat,lon); return {cx,cy,rx:ro/(V.lon[1]-V.lon[0])*W,ry:rl/(V.lat[1]-V.lat[0])*H};};
+  const shown=leads.filter(l=>!zoneF||l.zone===zoneF);
+  const sc=Math.max(1,H/900); const r=8*sc;
+  const s=leads.find(l=>l.id===sel);
+  const labels=[["Năvodari",44.33,28.61],["Mamaia",44.24,28.645],["Lacul Siutghiol",44.24,28.598],["Constanța",44.18,28.625],["Agigea",44.09,28.625],["Lacul Techirghiol",44.05,28.592],["Eforie Nord",44.064,28.655],["Eforie Sud",44.025,28.662],["Marea Neagră",44.13,28.695]];
+  return html`
+  <div className="topbar"><h1>Hartă</h1><span className="sp"></span>
+    <select id="map-zone" className="select" value=${zoneF} onChange=${e=>setZoneF(e.target.value)} aria-label="Filtrează după zonă"><option value="">Toate zonele</option>${Object.entries(ZONES).map(([k2,v])=>html`<option key=${k2} value=${k2}>${v}</option>`)}</select></div>
+  <div className="mapwrap">
+    <div className="map">
+      <svg viewBox=${`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" role="img" aria-label="Harta unităților de cazare de pe litoral">
+        <rect x="-6000" y="-6000" width=${W+12000} height=${H+12000} fill="#10263A"/>
+        <path d=${sea} fill="#0B3B4A"/>
+        <path d=${"M"+COAST.map(([a,b])=>px(a,b).join(",")).join(" L")} fill="none" stroke="#BFA18155" stroke-width=${2*sc}/>
+        <ellipse ...${ell(44.245,28.6,0.04,0.022)} fill="#0E3445"/>
+        <ellipse ...${ell(44.05,28.6,0.012,0.032)} fill="#0E3445"/>
+        ${labels.map(([t,a,b])=>{const [x,y]=px(a,b); return html`<text key=${t} x=${x} y=${y} font-size=${13*sc} text-anchor="middle" style=${{fill:t.startsWith("Marea")||t.startsWith("Lacul")?"#4C8C9C":"#8EA2B6"}} opacity=".8">${t}</text>`;})}
+        ${shown.map(l=>{const [x,y]=px(l.lat,l.lon); const on=sel===l.id; return html`<g key=${l.id} className="pin" onClick=${()=>setSel(l.id)} tabIndex="0" onKeyDown=${e=>e.key==="Enter"&&setSel(l.id)} role="button" aria-label=${l.name}>
+          <circle cx=${x} cy=${y} r=${on?r*1.6:r} fill=${STAGE[l.stage].color} stroke=${on?"#fff":"#0A1828"} stroke-width=${(on?3:2)*sc}/>
+          ${l.priority==="A"&&html`<circle cx=${x} cy=${y} r=${r/2.6} fill="#0A1828"/>`}
+          <title>${l.name} · ${STAGE[l.stage].label}</title></g>`;})}
+      </svg>
+      <div className="mapctl">${Object.entries(VIEWS).map(([k2,v])=>html`<button key=${k2} className="chip" style=${{background:vk===k2?"#178582":"#0A1828cc",color:"var(--text)"}} aria-pressed=${vk===k2} onClick=${()=>setVk(k2)}>${v.label}</button>`)}</div>
+      <div className="mapnote">Contur aproximativ pentru prototip. În aplicație: Leaflet + OpenStreetMap, cu străzi și zoom. Punctul din mijloc marchează prioritatea A.</div>
+    </div>
+    <div className="mapside">
+      ${s?html`<div className="panel stack" style=${{gap:"8px"}}>
+        <div className="row" style=${{flexWrap:"nowrap"}}><${Prio} p=${s.priority}/><b style=${{flex:1}}>${s.name}</b><button className="btn ghost sm" onClick=${()=>setSel(null)} aria-label="Închide"><${Icon} n="x" s=${14}/></button></div>
+        <div className="muted" style=${{fontSize:"13px"}}>${s.address}, ${ZONES[s.zone]}</div>
+        <div className="row"><${StageBadge} s=${s.stage}/><${Web} w=${s.web}/></div>
+        <div className="row"><button className="btn primary sm" onClick=${()=>open(s.id)}>Deschide fișa</button><a className="btn sm" href=${mapsLink(s)} target="_blank" rel="noopener"><${Icon} n="pin" s=${14}/>Navighează</a></div>
+      </div>`:html`<div className="panel muted" style=${{fontSize:"13px"}}>Apasă pe un punct ca să vezi unitatea. Culoarea arată etapa din pipeline.</div>`}
+      <div className="panel"><h3 style=${{marginBottom:"8px"}}>Legendă</h3><div className="stack" style=${{gap:"6px"}}>
+        ${STAGES.map(([k2,lb,c])=>html`<span key=${k2} className="badge" style=${{fontWeight:500}}><i className="dot" style=${{background:c}}></i>${lb}<span className="muted num" style=${{marginLeft:"auto"}}>${shown.filter(l=>l.stage===k2).length}</span></span>`)}
+      </div></div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- Clienți ---------------- */
+const IMPL={site:"Site",motor:"Motor rezervări",ical:"iCal",plati:"Plăți"};
+const IMPLS={NEINCEPUT:"neînceput",IN_LUCRU:"în lucru",GATA:"gata"};
+function Clients({leads,open,upd,say}){
+  const cl=leads.filter(l=>l.client);
+  const mrr=cl.reduce((s,l)=>s+l.client.monthly,0);
+  const unpaid=cl.reduce((s,l)=>s+l.client.payments.filter(p=>p.status==="NEPLATIT").length*l.client.monthly,0);
+  const month=m=>{const d=new Date(T0);d.setDate(1);d.setMonth(d.getMonth()+m);return d.toLocaleDateString("ro-RO",{month:"short",year:"2-digit"});};
+  const cycle=v=>({NEINCEPUT:"IN_LUCRU",IN_LUCRU:"GATA",GATA:"NEINCEPUT"})[v];
+  return html`
+  <div className="topbar"><h1>Clienți</h1><span className="sp"></span><span className="muted num">MRR <b style=${{color:"var(--gold-hi)"}}>${lei(mrr)}</b> · restanțe <b style=${{color:unpaid?"var(--danger)":"var(--ok)"}}>${lei(unpaid)}</b></span></div>
+  <div className="clients">
+    ${cl.map(l=>{const c=l.client; return html`<article key=${l.id} className="panel stack">
+      <div><button className="btn ghost" style=${{padding:0,border:0,fontFamily:"var(--f-display)",fontSize:"16px",fontWeight:700}} onClick=${()=>open(l.id)}>${l.name}</button><div className="muted" style=${{fontSize:"12px"}}>${ZONES[l.zone]} · client din ${new Date(c.start).toLocaleDateString("ro-RO",{day:"numeric",month:"long"})}</div></div>
+      <dl className="kv" style=${{gridTemplateColumns:"110px minmax(0,1fr)"}}>
+        <dt>Plan</dt><dd>${c.plan}</dd>
+        <dt>Setup</dt><dd className="num">${lei(c.setup)}</dd>
+        <dt>Abonament</dt><dd className="num" style=${{color:"var(--gold-hi)"}}>${lei(c.monthly)} / lună</dd>
+        <dt>Domeniu</dt><dd>${c.domain||html`<span className="muted">de stabilit</span>`}</dd>
+        <dt>tenantSlug</dt><dd><code>${c.tenantSlug}</code></dd>
+      </dl>
+      <div><div className="eyebrow" style=${{marginBottom:"6px"}}>Implementare · apasă ca să schimbi</div><div className="impl">${Object.entries(IMPL).map(([k,lb])=>html`<div key=${k} className=${c.impl[k]} role="button" tabIndex="0" style=${{cursor:"pointer"}} onClick=${()=>upd(l.id,x=>({...x,client:{...x.client,impl:{...x.client.impl,[k]:cycle(x.client.impl[k])}}}))}>${lb}<br/><b>${IMPLS[c.impl[k]]}</b></div>`)}</div></div>
+      <div><div className="eyebrow" style=${{marginBottom:"6px"}}>Abonament lunar</div><div className="months">${c.payments.map((p,i)=>html`<button key=${i} className=${p.status} onClick=${()=>{upd(l.id,x=>({...x,client:{...x.client,payments:x.client.payments.map((q,j)=>j===i?{...q,status:q.status==="PLATIT"?"NEPLATIT":"PLATIT"}:q)}}));say("Încasare actualizată");}}>${month(p.m)} · ${p.status==="PLATIT"?"plătit":"neplătit"}</button>`)}</div></div>
+    </article>`;})}
+    ${cl.length===0&&html`<p className="muted">Încă niciun client. Mută un lead în „Câștigat” ca să apară aici.</p>`}
+  </div>`;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(html`<${App}/>`);
+</script>
