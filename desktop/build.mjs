@@ -23,7 +23,7 @@ fs.writeFileSync(
       name: "twopixeldev-crm",
       productName: "twopixeldev CRM",
       version: rootPkg.version,
-      description: "CRM intern twopixeldev pentru unitățile de cazare de pe litoral",
+      description: "CRM intern twopixeldev - unitati de cazare de pe litoral",
       author: "twopixeldev",
       main: "main.js",
       private: true,

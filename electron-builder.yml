@@ -37,6 +37,8 @@ nsis:
     - ro_RO
   language: "1048"
   deleteAppDataOnUninstall: false
+  # NSIS nu are traduse în română câteva texte (ex. alegerea modului de instalare); le lasă în engleză
+  warningsAsErrors: false
 linux:
   target: dir
   icon: desktop/build/icon.png
