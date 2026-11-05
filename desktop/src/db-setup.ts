@@ -15,6 +15,23 @@ const MIGRATION_LOCK_ID = 727073690;
 
 export class SetupError extends Error {}
 
+/**
+ * Parolele cu caractere speciale (@ # / ? % :) strică adresa dacă nu sunt codate.
+ * Parola e tot ce se află între primul „:” de după utilizator și ultimul „@” dinaintea serverului.
+ */
+export function encodePassword(text: string): string {
+  const m = /^(postgres(?:ql)?:\/\/)([^:@/]+):(.*)@([^@/]+)(\/.*)?$/i.exec(text);
+  if (!m) return text;
+  const [, scheme, user, password, host, rest = ""] = m;
+  let plain = password ?? "";
+  try {
+    plain = decodeURIComponent(plain);
+  } catch {
+    // conține „%” care nu face parte dintr-o codare; îl păstrăm ca atare
+  }
+  return `${scheme}${user}:${encodeURIComponent(plain)}@${host}${rest}`;
+}
+
 /** Verifică adresa lipită de utilizator și o completează cu opțiunile de care are nevoie Prisma. */
 export function normalizeDatabaseUrl(raw: string): string {
   const text = raw.trim();
@@ -24,7 +41,7 @@ export function normalizeDatabaseUrl(raw: string): string {
   }
   let url: URL;
   try {
-    url = new URL(text);
+    url = new URL(encodePassword(text));
   } catch {
     throw new SetupError("Adresa nu e validă. Trebuie să înceapă cu postgresql://");
   }
