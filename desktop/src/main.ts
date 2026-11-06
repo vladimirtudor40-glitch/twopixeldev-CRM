@@ -114,6 +114,23 @@ function createWindow(): BrowserWindow {
   return win;
 }
 
+/**
+ * Chromium scrie cookie-urile pe disc doar o dată la ~30 de secunde. Dacă programul e oprit forțat
+ * în acest interval (închidere din Task Manager, oprirea Windows-ului, instalarea unei actualizări),
+ * sesiunea abia creată se pierde și „Ține-mă minte” pare să nu funcționeze. Așa că salvăm imediat
+ * după orice schimbare de cookie (login, logout, reînnoirea sesiunii).
+ */
+function persistCookiesImmediately(): void {
+  let timer: NodeJS.Timeout | null = null;
+  session.defaultSession.cookies.on("changed", () => {
+    if (timer) return;
+    timer = setTimeout(() => {
+      timer = null;
+      void session.defaultSession.cookies.flushStore().catch(() => undefined);
+    }, 200);
+  });
+}
+
 function getWindow(): BrowserWindow {
   if (!mainWindow || mainWindow.isDestroyed()) mainWindow = createWindow();
   return mainWindow;
@@ -364,6 +381,7 @@ if (!app.requestSingleInstanceLock()) {
   });
 
   void app.whenReady().then(() => {
+    persistCookiesImmediately();
     registerIpc();
     buildMenu();
     void boot();

@@ -18,3 +18,6 @@ export function isSessionAlive(claims: RememberClaims, tempCookie: string | unde
   if (!claims || claims.remember !== false) return true;
   return !!claims.sid && tempCookie === claims.sid;
 }
+
+/** Emailul ultimei autentificări cu „Ține-mă minte”, precompletat data viitoare (parola nu se salvează niciodată). */
+export const LAST_EMAIL_COOKIE = "tpd.ultimul-email";
