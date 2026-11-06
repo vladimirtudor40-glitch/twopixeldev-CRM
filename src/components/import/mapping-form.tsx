@@ -21,9 +21,9 @@ export function MappingForm({ batchId, headers, map, targets, samples }: {
   return (
     <div className="flex flex-col gap-3">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] text-sm">
+        <table className="w-full min-w-[620px] text-sm">
           <thead>
-            <tr className="text-left text-[15px] uppercase tracking-[0.06em] text-ink-muted">
+            <tr className="text-left text-[11px] uppercase tracking-[0.06em] text-ink-muted">
               <th className="py-1.5 pr-3 font-semibold">Coloana din fișier</th>
               <th className="py-1.5 pr-3 font-semibold">Exemplu</th>
               <th className="py-1.5 font-semibold">Câmp în CRM</th>

@@ -71,7 +71,7 @@ function LeadsGroup({ item, path }: { item: (typeof ITEMS)[number]; path: string
         <ul className="ml-[1.3rem] mt-0.5 flex min-h-0 flex-col gap-0.5 overflow-hidden border-l border-navy-600 pl-2.5">
           {subItems.map((c) => (
             <li key={c.key}>
-              <Link href={c.href} aria-current={c.active ? "page" : undefined} className={cn(itemClass(c.active), "py-1.5 text-[17px]")}>
+              <Link href={c.href} aria-current={c.active ? "page" : undefined} className={cn(itemClass(c.active), "py-1.5 text-[13px]")}>
                 <c.icon size={15} aria-hidden />
                 {c.label}
               </Link>
@@ -114,7 +114,7 @@ export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
         const active = isActive(path, i);
         return (
           <Link key={i.href} href={i.href} aria-current={active ? "page" : undefined}
-            className={cn("flex flex-col items-center gap-0.5 py-2 text-[15px] text-ink-muted", active && "text-gold")}>
+            className={cn("flex flex-col items-center gap-0.5 py-2 text-[11px] text-ink-muted", active && "text-gold")}>
             <i.icon size={20} aria-hidden />
             {i.label}
           </Link>

@@ -6,12 +6,12 @@ const control =
   "focus:border-teal focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-danger";
 
 export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputElement>>(({ className, ...p }, ref) => (
-  <input ref={ref} className={cn(control, "h-11", className)} {...p} />
+  <input ref={ref} className={cn(control, "h-9", className)} {...p} />
 ));
 Input.displayName = "Input";
 
 export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSelectElement>>(({ className, ...p }, ref) => (
-  <select ref={ref} className={cn(control, "h-11 pr-8", className)} {...p} />
+  <select ref={ref} className={cn(control, "h-9 pr-8", className)} {...p} />
 ));
 Select.displayName = "Select";
 
