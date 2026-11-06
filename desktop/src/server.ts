@@ -111,7 +111,7 @@ export async function startServer(config: AppConfig): Promise<string> {
       currentUrl = base;
       return base;
     }
-    await new Promise((r) => setTimeout(r, 300));
+    await new Promise((r) => setTimeout(r, 100));
   }
   await stopServer();
   throw new Error("Serverul aplicației nu a pornit în 60 de secunde. Detalii în jurnal.");

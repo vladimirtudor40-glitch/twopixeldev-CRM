@@ -13,8 +13,7 @@ const s = (v: unknown) => (v === null || v === undefined ? "" : String(v));
 
 export default async function EditLeadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireUser();
-  const [lead, users] = await Promise.all([getLeadDetail(id), listActiveUsers()]);
+  const [user, lead, users] = await Promise.all([requireUser(), getLeadDetail(id), listActiveUsers()]);
   if (!lead) notFound();
   if (!canEditLead(user, lead)) {
     return (

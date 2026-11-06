@@ -8,7 +8,7 @@ import { TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { formatNumber, relativeDays } from "@/lib/utils";
 import { listActiveUsers, listLeads, parseLeadFilters, type LeadFilters as F } from "@/server/queries/leads";
-import { requireUser } from "@/server/session";
+import { requireUser, sessionUserId } from "@/server/session";
 
 export const metadata: Metadata = { title: "Lead-uri" };
 
@@ -19,13 +19,14 @@ const SORT_COLUMNS: { key: F["sort"]; label: string }[] = [
 ];
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
-  const user = await requireUser();
-  const sp = await searchParams;
+  const [userId, sp] = await Promise.all([sessionUserId(), searchParams]);
   const f = parseLeadFilters(sp);
-  const [{ total, rows, pages }, users, views] = await Promise.all([
-    listLeads(f, user.id),
+  // Toate interogările pleacă odată, inclusiv verificarea contului: un singur drum până la baza de date.
+  const [user, { total, rows, pages }, users, views] = await Promise.all([
+    requireUser(),
+    listLeads(f, userId),
     listActiveUsers(),
-    prisma.savedView.findMany({ where: { OR: [{ userId: user.id }, { isShared: true }] }, orderBy: { name: "asc" } }),
+    prisma.savedView.findMany({ where: { OR: [{ userId }, { isShared: true }] }, orderBy: { name: "asc" } }),
   ]);
 
   const qs = (patch: Record<string, string | null>) => {
