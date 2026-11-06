@@ -33,6 +33,7 @@ export const leadFormSchema = z
     name: z.string().trim().min(2, "Scrie numele lead-ului.").max(200),
     category: z.enum(CATEGORIES as [string, ...string[]]),
     type: z.enum(TYPES as [string, ...string[]]),
+    businessType: optionalText(80),
     zone: z.enum(ZONES as [string, ...string[]]),
     address: optionalText(300),
     latitude: optionalNumber(-90, 90, "Latitudine între -90 și 90."),

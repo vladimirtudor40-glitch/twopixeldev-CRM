@@ -54,6 +54,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
               <PriorityBadge p={lead.priority} />
               <span>
                 {CATEGORY_SINGULAR[lead.category]}
+                {lead.category !== "HOTELURI" && lead.businessType ? ` · ${lead.businessType}` : ""}
                 {lead.category === "HOTELURI" && <>
                   {` · ${TYPE_LABEL[lead.type]}`}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}
                 </>}

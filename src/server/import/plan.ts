@@ -7,7 +7,7 @@ export type ExistingLead = IndexEntry & { values: Partial<Record<FillableKey, un
 
 /** Câmpurile pe care importul le poate completa. Nume, zonă, sursă și prioritate nu se schimbă la re-import. */
 export const FILLABLE_KEYS = [
-  "type", "address", "latitude", "longitude", "phone", "phoneNormalized", "email", "starsOsm",
+  "type", "businessType", "address", "latitude", "longitude", "phone", "phoneNormalized", "email", "starsOsm",
   "categoryMinistry", "roomsCount", "placesCount", "websiteStatus", "websiteUrl", "bookingUrl",
   "facebookUrl", "instagramUrl", "otherLinks", "googleMapsUrl", "osmUrl", "osmId", "operatorName",
   "operatorCui", "inMinistryList", "manualCheckNote",
@@ -117,7 +117,7 @@ export function planImport({ rows, columnMap, existing, newId }: PlanInput): Imp
       creates.set(id, data);
       createdAtRow.set(id, row.rowNumber);
       const entry: IndexEntry = {
-        id, osmId: data.osmId ?? null, nameNormalized: data.nameNormalized, zone: data.zone,
+        id, osmId: data.osmId ?? null, category: data.category, nameNormalized: data.nameNormalized, zone: data.zone,
         phoneNormalized: data.phoneNormalized ?? null,
       };
       index.add(entry);
@@ -130,7 +130,10 @@ export function planImport({ rows, columnMap, existing, newId }: PlanInput): Imp
 
     const leadId = hit.entry.id;
     const cur = current.get(leadId) ?? {};
-    const { patch, fields } = fillEmpty(cur, data);
+    // Același obiect OSM în altă categorie (ex. hotel cu restaurant): rămâne un singur lead, în categoria lui,
+    // fără să primească tipul din cealaltă categorie.
+    const incoming = hit.entry.category === data.category ? data : { ...data, type: undefined, businessType: undefined };
+    const { patch, fields } = fillEmpty(cur, incoming);
     const mergedIntoRow = createdAtRow.get(leadId) ?? null;
     if (fields.length) {
       Object.assign(cur, patch);

@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS "backup"."Lead_inainte_de_categorii" AS TABLE "Lead";
 CREATE TYPE "LeadCategory" AS ENUM ('HOTELURI', 'BARBERSHOPURI', 'RESTAURANTE', 'ACTIVITATI', 'SALOANE_BEAUTY');
 
 -- AlterTable
-ALTER TABLE "Lead" ADD COLUMN "category" "LeadCategory" NOT NULL DEFAULT 'HOTELURI';
+ALTER TABLE "Lead" ADD COLUMN "category" "LeadCategory" NOT NULL DEFAULT 'HOTELURI',
+ADD COLUMN "businessType" TEXT;
 
 -- CreateIndex
 CREATE INDEX "Lead_category_priority_idx" ON "Lead"("category", "priority");

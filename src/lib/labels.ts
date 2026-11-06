@@ -144,6 +144,7 @@ export const AUDIT_LABEL: Record<AuditAction, string> = {
 export const LEAD_FIELD_LABEL: Record<string, string> = {
   name: "Nume",
   category: "Categorie",
+  businessType: "Tip (liber)",
   type: "Tip",
   zone: "Zonă",
   address: "Adresă",

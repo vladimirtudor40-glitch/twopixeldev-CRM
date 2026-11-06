@@ -21,8 +21,9 @@ const SORT_COLUMNS: { key: F["sort"]; label: string }[] = [
 ];
 
 /** Sub-titlul rândului: tipul unității (doar la cazare) și adresa. */
-const subtitle = (l: { category: keyof typeof CATEGORY_LABEL; type: keyof typeof TYPE_LABEL; address: string | null }) =>
-  [l.category === "HOTELURI" ? TYPE_LABEL[l.type] : null, l.address].filter(Boolean).join(" · ");
+const kind = (l: { category: keyof typeof CATEGORY_LABEL; type: keyof typeof TYPE_LABEL; businessType: string | null }) =>
+  l.category === "HOTELURI" ? TYPE_LABEL[l.type] : l.businessType;
+const subtitle = (l: Parameters<typeof kind>[0] & { address: string | null }) => [kind(l), l.address].filter(Boolean).join(" · ");
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const [userId, sp] = await Promise.all([sessionUserId(), searchParams]);
@@ -131,7 +132,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <StageBadge s={l.stage} />
                   </span>
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
-                    {CATEGORY_SINGULAR[l.category]} · {ZONE_LABEL[l.zone]}{l.category === "HOTELURI" ? ` · ${TYPE_LABEL[l.type]}` : ""} <WebsiteBadge w={l.websiteStatus} />
+                    {[CATEGORY_SINGULAR[l.category], ZONE_LABEL[l.zone], kind(l)].filter(Boolean).join(" · ")} <WebsiteBadge w={l.websiteStatus} />
                     {l.phone && <span className="tabular text-ink">{l.phone}</span>}
                     {l.doNotContact && <OptOutBadge />}
                   </span>

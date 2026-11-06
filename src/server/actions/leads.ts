@@ -13,7 +13,7 @@ import { requireUser } from "@/server/session";
 import type { ActionResult } from "./types";
 
 const AUDITED = [
-  "name", "category", "type", "zone", "address", "latitude", "longitude", "phone", "email", "starsOsm", "categoryMinistry",
+  "name", "category", "type", "businessType", "zone", "address", "latitude", "longitude", "phone", "email", "starsOsm", "categoryMinistry",
   "roomsCount", "placesCount", "websiteStatus", "websiteUrl", "bookingUrl", "facebookUrl", "instagramUrl",
   "googleMapsUrl", "ratingGoogle", "ratingBooking", "operatorName", "operatorCui", "source", "priority", "ownerId", "notes",
 ];
@@ -26,6 +26,7 @@ function toLeadData(d: ReturnType<typeof leadFormSchema.parse>) {
     category: d.category as Prisma.LeadCreateInput["category"],
     // Tipul unității are sens doar la cazare; la celelalte categorii rămâne „Altul”.
     type: (d.category === "HOTELURI" ? d.type : "ALTUL") as Prisma.LeadCreateInput["type"],
+    businessType: d.category === "HOTELURI" ? null : d.businessType,
     zone: d.zone as Prisma.LeadCreateInput["zone"],
     address: d.address,
     latitude: d.latitude,

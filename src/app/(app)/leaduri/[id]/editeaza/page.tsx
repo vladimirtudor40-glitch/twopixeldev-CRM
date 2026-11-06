@@ -33,7 +33,7 @@ export default async function EditLeadPage({ params }: { params: Promise<{ id: s
         users={users}
         canChangeOwner={user.role === "ADMIN" || !lead.ownerId}
         defaults={{
-          name: lead.name, category: lead.category, type: lead.type, zone: lead.zone, address: s(lead.address),
+          name: lead.name, category: lead.category, type: lead.type, businessType: s(lead.businessType), zone: lead.zone, address: s(lead.address),
           latitude: s(lead.latitude), longitude: s(lead.longitude), phone: s(lead.phone), email: s(lead.email),
           starsOsm: s(lead.starsOsm), categoryMinistry: s(lead.categoryMinistry), roomsCount: s(lead.roomsCount),
           placesCount: s(lead.placesCount), websiteStatus: lead.websiteStatus, websiteUrl: s(lead.websiteUrl),

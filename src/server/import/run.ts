@@ -49,7 +49,7 @@ export function readMapping(json: Prisma.JsonValue): BatchMapping {
 
 /** Toate lead-urile (și cele arhivate, ca să nu fie re-create), cu valorile câmpurilor completabile. */
 export async function loadExistingLeads(db: PrismaClient | Prisma.TransactionClient): Promise<ExistingLead[]> {
-  const select = Object.fromEntries([...FILLABLE_KEYS, "id", "nameNormalized", "zone"].map((k) => [k, true])) as Prisma.LeadSelect;
+  const select = Object.fromEntries([...FILLABLE_KEYS, "id", "category", "nameNormalized", "zone"].map((k) => [k, true])) as Prisma.LeadSelect;
   const leads = (await db.lead.findMany({ select })) as unknown as Array<Record<string, unknown>>;
   return leads.map((l) => {
     const values: Partial<Record<FillableKey, unknown>> = {};
@@ -60,6 +60,7 @@ export async function loadExistingLeads(db: PrismaClient | Prisma.TransactionCli
     return {
       id: l.id as string,
       osmId: (l.osmId as string | null) ?? null,
+      category: l.category as ExistingLead["category"],
       nameNormalized: l.nameNormalized as string,
       zone: l.zone as ExistingLead["zone"],
       phoneNormalized: (l.phoneNormalized as string | null) ?? null,
@@ -97,7 +98,9 @@ function toCreateInput(
     name: d.name,
     nameNormalized: d.nameNormalized,
     zone: d.zone,
+    category: d.category,
     type: d.type ?? "ALTUL",
+    businessType: d.businessType ?? null,
     address: d.address ?? null,
     latitude: d.latitude ?? null,
     longitude: d.longitude ?? null,

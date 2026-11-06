@@ -90,7 +90,7 @@ export async function listLeads(f: LeadFilters, currentUserId: string) {
       skip: (f.pagina - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       select: {
-        id: true, name: true, category: true, type: true, zone: true, address: true, phone: true, email: true,
+        id: true, name: true, category: true, type: true, businessType: true, zone: true, address: true, phone: true, email: true,
         priority: true, stage: true, websiteStatus: true, roomsCount: true, starsOsm: true,
         lastInteractionAt: true, doNotContact: true, archivedAt: true,
         owner: { select: { id: true, name: true, email: true } },

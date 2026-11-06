@@ -59,7 +59,9 @@ export function LeadForm({ leadId, defaults, users, canChangeOwner }: Props) {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Nume *" htmlFor="f-name" error={err("name")} className="sm:col-span-2 lg:col-span-1"><Input {...reg("name")} autoFocus={!leadId} /></Field>
           <Field label="Categorie" htmlFor="f-category"><Select {...reg("category")}>{CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}</Select></Field>
-          {isLodging && <Field label="Tip unitate" htmlFor="f-type"><Select {...reg("type")}>{TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</Select></Field>}
+          {isLodging
+            ? <Field label="Tip unitate" htmlFor="f-type"><Select {...reg("type")}>{TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</Select></Field>
+            : <Field label="Tip" htmlFor="f-businessType" error={err("businessType")}><Input {...reg("businessType")} placeholder="ex. Cafenea, Beach club" /></Field>}
           <Field label="Zonă" htmlFor="f-zone"><Select {...reg("zone")}>{ZONES.map((z) => <option key={z} value={z}>{ZONE_LABEL[z]}</option>)}</Select></Field>
           <Field label="Adresă" htmlFor="f-address" error={err("address")} className="sm:col-span-2"><Input {...reg("address")} /></Field>
           {isLodging && (
