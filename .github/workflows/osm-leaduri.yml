@@ -1,0 +1,19 @@
+name: Descarcă lead-uri OSM
+on:
+  push:
+    branches: [claude/project-thread-f7xnep]
+    paths: [scripts/osm/descarca_osm.py, .github/workflows/osm-leaduri.yml]
+permissions:
+  contents: write
+jobs:
+  osm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/osm/descarca_osm.py scripts/osm/osm_raw.json
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@users.noreply.github.com
+          git add scripts/osm/osm_raw.json
+          git commit -m "Date OSM brute (generat de workflow)"
+          git push
