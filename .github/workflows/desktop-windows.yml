@@ -34,14 +34,10 @@ jobs:
       - name: Teste
         run: npm test
 
-      - name: Construiește installer-ul
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        run: npm run desktop:dist
-
-      # Pe tag-uri v*: publică în GitHub Releases installer-ul + latest.yml, de unde programul instalat
-      # își ia singur actualizările
-      - name: Construiește și publică versiunea (actualizare automată)
-        if: startsWith(github.ref, 'refs/tags/v')
+      # Publică installer-ul + latest.yml în GitHub Releases, ca versiunea „v<version din package.json>”.
+      # Programul instalat își ia de acolo singur actualizările. Dacă versiunea există deja,
+      # electron-builder nu o suprascrie: o versiune nouă cere creșterea „version” în package.json.
+      - name: Construiește și publică versiunea
         run: npm run desktop:release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

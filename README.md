@@ -48,8 +48,9 @@ CRM-ul se instalează pe laptop ca program obișnuit (`twopixeldev-CRM-Setup-<ve
 
 ### De unde iei installer-ul
 
-- La fiecare push pe `main` sau `desktop-windows`, GitHub Actions construiește installer-ul pe Windows. Îl găsești în tab-ul **Actions** → ultima rulare „Program Windows (.exe)” → secțiunea **Artifacts** → `twopixeldev-CRM-Windows` (o arhivă .zip cu .exe-ul înăuntru).
-- Pentru o versiune „oficială”, creezi un tag `v0.2.0` (de exemplu). Installer-ul apare atunci în **Releases**.
+- La fiecare push pe `main` sau `desktop-windows`, GitHub Actions construiește installer-ul pe Windows și îl publică în **Releases** ca `v<versiune>` (versiunea din `package.json`). Ultima versiune: pagina **Releases** a repo-ului.
+- Programul instalat verifică singur Releases la pornire și la fiecare 4 ore, descarcă versiunea nouă în fundal și te întreabă dacă repornește acum (sau o instalează când închizi programul). Manual: **Ajutor → Caută actualizări**.
+- Ca să livrezi o actualizare, crești `version` în `package.json` și faci push. Fără creșterea versiunii, Release-ul existent nu se schimbă.
 - Installer-ul nu e semnat digital, așa că Windows poate afișa „Windows a protejat computerul”. Apeși **Mai multe informații** → **Rulează oricum**.
 
 ### Prima pornire
