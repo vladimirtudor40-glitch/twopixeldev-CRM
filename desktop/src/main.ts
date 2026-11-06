@@ -256,6 +256,17 @@ function buildMenu(): void {
         },
         { label: "Reîncarcă", accelerator: "CmdOrCtrl+R", click: () => getWindow().webContents.reload() },
         { type: "separator" },
+        {
+          // Același ecran ca fostul buton „Import” din meniul lateral (doar pentru administratori).
+          label: "Importă...",
+          accelerator: "CmdOrCtrl+I",
+          click: () => {
+            const url = serverUrl();
+            if (url) void getWindow().loadURL(`${url}/import`);
+            else void boot();
+          },
+        },
+        { type: "separator" },
         { label: "Conexiunea la baza de date…", click: () => void showSetup() },
         {
           label: "Deschide folderul cu jurnale",

@@ -56,7 +56,7 @@ export default async function DashboardPage() {
           <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
               { label: "Unități în bază", value: total, sub: `${formatNumber(withPhone)} cu telefon`, href: "/leaduri" },
-              { label: "Prioritate A de sunat", value: toCallTotal, sub: "cu telefon, încă necontactate", href: "/leaduri?prioritate=A&etapa=NOU&telefon=da&optout=ascunde" },
+              { label: "Prioritate A de sunat", value: toCallTotal, sub: "cu telefon, încă necontactate", href: "/leaduri" },
               { label: "De verificat pe Google Maps", value: stageCount("NOU") + stageCount("DE_VERIFICAT") - toCallTotal, sub: "fără telefon sau prioritate B/C", href: "/leaduri?etapa=NOU,DE_VERIFICAT&telefon=nu" },
               { label: "Ale mele", value: mine, sub: optOut ? `${optOut} cu „Nu mai contacta”` : "lead-uri cu tine responsabil", href: "/leaduri?responsabil=eu" },
             ].map((k) => (
@@ -72,7 +72,7 @@ export default async function DashboardPage() {
             <Panel>
               <div className="mb-2 flex items-center gap-2">
                 <h2 className="font-display text-base font-bold">De sunat primii</h2>
-                <Link href="/leaduri?prioritate=A&etapa=NOU&telefon=da&optout=ascunde" className="ml-auto text-xs text-teal-hi hover:underline">Toate {toCallTotal} →</Link>
+                <Link href="/leaduri" className="ml-auto text-xs text-teal-hi hover:underline">Toate {toCallTotal} →</Link>
               </div>
               <p className="mb-2 text-xs text-ink-muted">Prioritate A, cu telefon, încă în etapa „Nou”.</p>
               {toCall.length === 0 ? <p className="text-sm text-ink-muted">Nu mai sunt lead-uri A nesunate. Treci la cele B de verificat.</p> : (

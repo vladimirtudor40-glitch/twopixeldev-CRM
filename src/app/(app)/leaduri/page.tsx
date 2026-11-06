@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Plus, Upload } from "lucide-react";
 import { LeadFilters } from "@/components/leads/lead-filters";
+import { LeadRow } from "@/components/leads/lead-tabs";
 import { OptOutBadge, PriorityBadge, StageBadge, WebsiteBadge } from "@/components/ui/badges";
 import { buttonClass } from "@/components/ui/button";
-import { PageHeader } from "@/components/ui/page-header";
 import { TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { formatNumber, relativeDays } from "@/lib/utils";
@@ -45,15 +44,6 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <PageHeader
-        title="Lead-uri"
-        actions={
-          <>
-            {user.role === "ADMIN" && <Link href="/import" className={buttonClass("secondary")}><Upload size={15} />Import</Link>}
-            <Link href="/leaduri/nou" className={buttonClass("primary")}><Plus size={15} />Lead nou</Link>
-          </>
-        }
-      />
       <LeadFilters
         users={users}
         views={views.map((v) => ({
@@ -96,7 +86,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
               </thead>
               <tbody>
                 {rows.map((l) => (
-                  <tr key={l.id} className="border-t border-navy-600 hover:bg-navy-700/60">
+                  <LeadRow key={l.id} href={`/leaduri/${l.id}`} className="border-t border-navy-600 hover:bg-navy-700/60">
                     <td className="px-3 py-2"><PriorityBadge p={l.priority} /></td>
                     <td className="max-w-[320px] px-3 py-2">
                       <Link href={`/leaduri/${l.id}`} className="font-semibold hover:text-gold-hi">{l.name}</Link>
@@ -110,7 +100,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <td className="px-3 py-2 tabular">{l.roomsCount ?? <span className="text-ink-muted">—</span>}</td>
                     <td className="px-3 py-2">{l.lastInteractionAt ? relativeDays(l.lastInteractionAt) : <span className="text-ink-muted">niciodată</span>}</td>
                     <td className="px-3 py-2 text-ink-muted">{l.owner ? (l.owner.id === user.id ? "eu" : l.owner.name || l.owner.email) : "—"}</td>
-                  </tr>
+                  </LeadRow>
                 ))}
               </tbody>
             </table>

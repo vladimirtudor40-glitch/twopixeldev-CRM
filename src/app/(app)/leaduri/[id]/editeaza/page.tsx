@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LeadForm } from "@/components/leads/lead-form";
+import { LeadTabTitle } from "@/components/leads/lead-tabs";
 import { PageHeader } from "@/components/ui/page-header";
 import { canEditLead } from "@/server/permissions";
 import { getLeadDetail, listActiveUsers } from "@/server/queries/leads";
@@ -18,6 +19,7 @@ export default async function EditLeadPage({ params }: { params: Promise<{ id: s
   if (!canEditLead(user, lead)) {
     return (
       <>
+        <LeadTabTitle id={lead.id} title={lead.name} />
         <PageHeader title={lead.name} eyebrow="Editează" />
         <p className="text-sm text-ink-muted">Poți edita doar lead-urile tale sau pe cele fără responsabil. Cere unui administrator să ți-l atribuie.</p>
       </>
@@ -25,6 +27,7 @@ export default async function EditLeadPage({ params }: { params: Promise<{ id: s
   }
   return (
     <>
+      <LeadTabTitle id={lead.id} title={lead.name} />
       <PageHeader title={lead.name} eyebrow="Editează lead" />
       <LeadForm
         leadId={lead.id}
