@@ -17,8 +17,7 @@
     "postinstall": "prisma generate",
     "desktop:prepare": "node desktop/build.mjs",
     "desktop:start": "node desktop/build.mjs && electron desktop/app",
-    "desktop:dist": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish never",
-    "desktop:release": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish always"
+    "desktop:dist": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish never"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

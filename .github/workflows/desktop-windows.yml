@@ -34,13 +34,28 @@ jobs:
       - name: Teste
         run: npm test
 
-      # Publică installer-ul + latest.yml în GitHub Releases, ca versiunea „v<version din package.json>”.
-      # Programul instalat își ia de acolo singur actualizările. Dacă versiunea există deja,
-      # electron-builder nu o suprascrie: o versiune nouă cere creșterea „version” în package.json.
-      - name: Construiește și publică versiunea
-        run: npm run desktop:release
+      - name: Construiește installer-ul
+        run: npm run desktop:dist
+
+      # Publică installer-ul + latest.yml în GitHub Releases, ca „v<version din package.json>”.
+      # Programul instalat își ia de acolo singur actualizările. O versiune nouă cere creșterea
+      # „version” în package.json; la același număr, fișierele Release-ului sunt înlocuite.
+      - name: Publică versiunea în Releases
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          cd dist-desktop/installer
+          ls -la
+          test -f latest.yml
+          FILES=(latest.yml "twopixeldev-CRM-Setup-${VERSION}.exe" "twopixeldev-CRM-Setup-${VERSION}.exe.blockmap")
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            gh release upload "v${VERSION}" "${FILES[@]}" --clobber
+          else
+            gh release create "v${VERSION}" "${FILES[@]}" --target "${GITHUB_SHA}" --title "twopixeldev CRM ${VERSION}" --notes "Installer pentru Windows: twopixeldev-CRM-Setup-${VERSION}.exe"
+          fi
 
       - name: Salvează installer-ul
         uses: actions/upload-artifact@v4
