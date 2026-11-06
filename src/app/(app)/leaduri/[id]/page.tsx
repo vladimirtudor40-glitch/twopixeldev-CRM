@@ -8,7 +8,7 @@ import { LeadTabTitle } from "@/components/leads/lead-tabs";
 import { PriorityBadge, StageBadge, WebsiteBadge } from "@/components/ui/badges";
 import { buttonClass } from "@/components/ui/button";
 import { Panel } from "@/components/ui/page-header";
-import { AUDIT_LABEL, IMPORT_ACTION_LABEL, LEAD_FIELD_LABEL, SOURCE_LABEL, TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
+import { AUDIT_LABEL, CATEGORY_SINGULAR, IMPORT_ACTION_LABEL, LEAD_FIELD_LABEL, SOURCE_LABEL, TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
 import { mailLink, mapsLink, telLink, whatsappLink } from "@/lib/links";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { canArchive, canEditLead } from "@/server/permissions";
@@ -52,7 +52,12 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
               <PriorityBadge p={lead.priority} />
-              <span>{TYPE_LABEL[lead.type]}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}</span>
+              <span>
+                {CATEGORY_SINGULAR[lead.category]}
+                {lead.category === "HOTELURI" && <>
+                  {` · ${TYPE_LABEL[lead.type]}`}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}
+                </>}
+              </span>
             </div>
             <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance">{lead.name}</h2>
             <p className="text-sm text-ink-muted">{[lead.address, ZONE_LABEL[lead.zone]].filter(Boolean).join(", ")}</p>

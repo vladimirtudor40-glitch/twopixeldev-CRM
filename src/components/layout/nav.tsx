@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ChevronDown, LayoutDashboard, List, Upload, Users } from "lucide-react";
-import { LEAD_CATEGORIES } from "@/lib/categories";
+import { usePathname, useSearchParams } from "next/navigation";
+import { ChevronDown, LayoutDashboard, Layers, List, Upload, Users } from "lucide-react";
+import { categoryHref, LEAD_CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -25,12 +25,22 @@ const itemClass = (active: boolean) =>
     active && "bg-navy-700 text-ink [&>svg]:text-gold",
   );
 
-/** „Lead-uri” cu sub-categorii: numele duce la listă, chevron-ul deschide/închide sub-meniul. */
+/**
+ * „Lead-uri” cu sub-categorii: numele duce la lista cu toate categoriile, chevron-ul deschide/închide
+ * sub-meniul. Sub-categoriile sunt aceeași listă, filtrată pe categorie (?categorie=…).
+ */
 function LeadsGroup({ item, path }: { item: (typeof ITEMS)[number]; path: string }) {
+  const sp = useSearchParams();
   const inGroup = isActive(path, item);
   const [open, setOpen] = useState(inGroup);
   useEffect(() => { if (inGroup) setOpen(true); }, [inGroup]);
   const onList = path.startsWith("/leaduri");
+  const onListPage = path === "/leaduri";
+  const category = onListPage ? (sp.get("categorie") ?? "") : null;
+  const subItems = [
+    { key: "toate", href: "/leaduri", label: "Toate", icon: Layers, active: category === "" },
+    ...LEAD_CATEGORIES.map((c) => ({ key: c.slug, href: categoryHref(c.value), label: c.label, icon: c.icon, active: category === c.value })),
+  ];
 
   return (
     <div>
@@ -59,18 +69,14 @@ function LeadsGroup({ item, path }: { item: (typeof ITEMS)[number]; path: string
         inert={!open}
       >
         <ul className="ml-[1.3rem] mt-0.5 flex min-h-0 flex-col gap-0.5 overflow-hidden border-l border-navy-600 pl-2.5">
-          {LEAD_CATEGORIES.map((c) => {
-            const href = `/categorii/${c.slug}`;
-            const active = path === href;
-            return (
-              <li key={c.slug}>
-                <Link href={href} aria-current={active ? "page" : undefined} className={cn(itemClass(active), "py-1.5 text-[17px]")}>
-                  <c.icon size={15} aria-hidden />
-                  {c.label}
-                </Link>
-              </li>
-            );
-          })}
+          {subItems.map((c) => (
+            <li key={c.key}>
+              <Link href={c.href} aria-current={c.active ? "page" : undefined} className={cn(itemClass(c.active), "py-1.5 text-[17px]")}>
+                <c.icon size={15} aria-hidden />
+                {c.label}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </div>

@@ -4,7 +4,8 @@ import { LeadFilters } from "@/components/leads/lead-filters";
 import { LeadRow } from "@/components/leads/lead-tabs";
 import { OptOutBadge, PriorityBadge, StageBadge, WebsiteBadge } from "@/components/ui/badges";
 import { buttonClass } from "@/components/ui/button";
-import { TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
+import { CATEGORY_ICON } from "@/lib/categories";
+import { CATEGORY_LABEL, CATEGORY_SINGULAR, TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { formatNumber, relativeDays } from "@/lib/utils";
 import { listActiveUsers, listLeads, parseLeadFilters, type LeadFilters as F } from "@/server/queries/leads";
@@ -14,9 +15,14 @@ export const metadata: Metadata = { title: "Lead-uri" };
 
 const SORT_COLUMNS: { key: F["sort"]; label: string }[] = [
   { key: "prioritate", label: "Pr." },
-  { key: "nume", label: "Unitate" },
+  { key: "nume", label: "Nume" },
+  { key: "categorie", label: "Categorie" },
   { key: "zona", label: "Zonă" },
 ];
+
+/** Sub-titlul rândului: tipul unității (doar la cazare) și adresa. */
+const subtitle = (l: { category: keyof typeof CATEGORY_LABEL; type: keyof typeof TYPE_LABEL; address: string | null }) =>
+  [l.category === "HOTELURI" ? TYPE_LABEL[l.type] : null, l.address].filter(Boolean).join(" · ");
 
 export default async function LeadsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const [userId, sp] = await Promise.all([sessionUserId(), searchParams]);
@@ -55,13 +61,21 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         }))}
       />
       <p className="mb-2 text-sm text-ink-muted tabular" role="status">
-        {formatNumber(total)} {total === 1 ? "unitate" : "unități"}
+        {formatNumber(total)} {total === 1 ? "lead" : "lead-uri"}
+        {f.categorie.length > 0 && ` · ${f.categorie.map((c) => CATEGORY_LABEL[c]).join(", ")}`}
         {pages > 1 && ` · pagina ${f.pagina} din ${pages}`}
       </p>
 
       {rows.length === 0 ? (
         <div className="rounded-xl border border-dashed border-navy-600 p-8 text-center text-sm text-ink-muted">
-          Niciun lead nu se potrivește filtrelor.{" "}
+          {f.categorie.length === 1 && Object.keys(sp).length === 1 ? (
+            <>
+              Încă nu sunt lead-uri în categoria „{CATEGORY_LABEL[f.categorie[0]!]}”.{" "}
+              <Link href={`/leaduri/nou?categorie=${f.categorie[0]}`} className="text-teal-hi underline">Adaugă primul lead</Link>.
+            </>
+          ) : (
+            <>Niciun lead nu se potrivește filtrelor.</>
+          )}{" "}
           {total === 0 && !Object.keys(sp).length && user.role === "ADMIN" && (
             <>Începe cu <Link href="/import" className="text-teal-hi underline">importul Excel</Link> din scriptul de lead-uri.</>
           )}
@@ -69,7 +83,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       ) : (
         <>
           <div className="hidden overflow-x-auto rounded-xl border border-navy-600 bg-navy-800 md:block">
-            <table className="w-full min-w-[1180px] border-collapse text-sm">
+            <table className="w-full min-w-[1320px] border-collapse text-sm">
               <thead>
                 <tr className="bg-[#0D1F33] text-left text-[15px] uppercase tracking-[0.06em] text-ink-muted">
                   {SORT_COLUMNS.map((c) => (
@@ -92,8 +106,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <td className="max-w-[320px] px-3 py-2">
                       <Link href={`/leaduri/${l.id}`} className="font-semibold hover:text-gold-hi">{l.name}</Link>
                       {l.doNotContact && <span className="ml-2"><OptOutBadge /></span>}
-                      <div className="truncate text-xs text-ink-muted">{TYPE_LABEL[l.type]}{l.address ? ` · ${l.address}` : ""}</div>
+                      <div className="truncate text-xs text-ink-muted">{subtitle(l)}</div>
                     </td>
+                    <td className="whitespace-nowrap px-3 py-2"><CategoryCell c={l.category} /></td>
                     <td className="px-3 py-2">{ZONE_LABEL[l.zone]}</td>
                     <td className="px-3 py-2"><WebsiteBadge w={l.websiteStatus} /></td>
                     <td className="px-3 py-2"><StageBadge s={l.stage} /></td>
@@ -116,7 +131,7 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
                     <StageBadge s={l.stage} />
                   </span>
                   <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-ink-muted">
-                    {ZONE_LABEL[l.zone]} · {TYPE_LABEL[l.type]} <WebsiteBadge w={l.websiteStatus} />
+                    {CATEGORY_SINGULAR[l.category]} · {ZONE_LABEL[l.zone]}{l.category === "HOTELURI" ? ` · ${TYPE_LABEL[l.type]}` : ""} <WebsiteBadge w={l.websiteStatus} />
                     {l.phone && <span className="tabular text-ink">{l.phone}</span>}
                     {l.doNotContact && <OptOutBadge />}
                   </span>
@@ -135,5 +150,15 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
         </nav>
       )}
     </>
+  );
+}
+
+function CategoryCell({ c }: { c: keyof typeof CATEGORY_LABEL }) {
+  const Icon = CATEGORY_ICON[c];
+  return (
+    <span className="inline-flex items-center gap-1.5 text-ink">
+      <Icon size={14} className="text-gold" aria-hidden />
+      {CATEGORY_SINGULAR[c]}
+    </span>
   );
 }
