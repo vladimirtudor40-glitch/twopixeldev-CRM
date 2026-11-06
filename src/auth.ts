@@ -8,6 +8,8 @@ import { authConfig } from "./auth.config";
 const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
   password: z.string().min(1),
+  remember: z.enum(["0", "1"]).default("1"),
+  sid: z.string().uuid().optional(),
 });
 
 class InvalidLogin extends CredentialsSignin {
@@ -18,7 +20,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
     Credentials({
-      credentials: { email: { label: "Email" }, password: { label: "Parolă", type: "password" } },
+      credentials: { email: { label: "Email" }, password: { label: "Parolă", type: "password" }, remember: {}, sid: {} },
       async authorize(raw) {
         const parsed = loginSchema.safeParse(raw);
         if (!parsed.success) throw new InvalidLogin();
@@ -30,7 +32,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } }),
           prisma.auditLog.create({ data: { userId: user.id, action: "LOGIN", entityType: "User", entityId: user.id } }),
         ]);
-        return { id: user.id, email: user.email, name: user.name, role: user.role };
+        const remember = parsed.data.remember === "1";
+        return { id: user.id, email: user.email, name: user.name, role: user.role, remember, sid: remember ? undefined : parsed.data.sid };
       },
     }),
   ],
