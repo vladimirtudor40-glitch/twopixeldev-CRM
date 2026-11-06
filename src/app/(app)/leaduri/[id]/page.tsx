@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ExternalLink, Mail, MapPin, MessageCircle, Pencil, Phone } from "lucide-react";
 import { ArchiveButton, ClaimButton, OptOutControl } from "@/components/leads/lead-actions";
 import { ContactsSection } from "@/components/leads/contacts-section";
+import { LeadTabTitle } from "@/components/leads/lead-tabs";
 import { PriorityBadge, StageBadge, WebsiteBadge } from "@/components/ui/badges";
 import { buttonClass } from "@/components/ui/button";
 import { Panel } from "@/components/ui/page-header";
@@ -46,17 +47,15 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4">
+      <LeadTabTitle id={lead.id} title={lead.name} />
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-          <Link href="/leaduri" className="hover:text-ink">Lead-uri</Link><span aria-hidden>/</span><span>{ZONE_LABEL[lead.zone]}</span>
-        </div>
         <div className="flex flex-wrap items-start gap-3">
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
               <PriorityBadge p={lead.priority} />
               <span>{TYPE_LABEL[lead.type]}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}</span>
             </div>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-balance">{lead.name}</h1>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance">{lead.name}</h2>
             <p className="text-sm text-ink-muted">{[lead.address, ZONE_LABEL[lead.zone]].filter(Boolean).join(", ")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
