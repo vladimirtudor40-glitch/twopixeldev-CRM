@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 const ITEMS = [
   { href: "/", label: "Panou", icon: LayoutDashboard, exact: true },
   { href: "/leaduri", label: "Lead-uri", icon: List },
-  { href: "/import", label: "Import", icon: Upload, adminOnly: true },
+  // Import nu apare în meniul lateral: pe desktop e în Fișier → Importă..., pe mobil în bara de jos.
+  { href: "/import", label: "Import", icon: Upload, adminOnly: true, sidebar: false },
   { href: "/utilizatori", label: "Utilizatori", icon: Users, adminOnly: true },
 ];
 
@@ -80,7 +81,7 @@ export function SideNav({ isAdmin }: { isAdmin: boolean }) {
   const path = usePathname();
   return (
     <nav aria-label="Navigare" className="flex flex-col gap-0.5">
-      {ITEMS.filter((i) => !i.adminOnly || isAdmin).map((i) => {
+      {ITEMS.filter((i) => (!i.adminOnly || isAdmin) && i.sidebar !== false).map((i) => {
         if (i.href === "/leaduri") return <LeadsGroup key={i.href} item={i} path={path} />;
         const active = isActive(path, i);
         return (
