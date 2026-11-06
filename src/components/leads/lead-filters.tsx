@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Bookmark, Check, ChevronDown, Search, X } from "lucide-react";
-import { PRIORITIES, STAGES, STAGE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL } from "@/lib/labels";
+import { CATEGORIES, CATEGORY_LABEL, PRIORITIES, STAGES, STAGE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import { deleteView, saveView } from "@/server/actions/views";
 import { Button } from "@/components/ui/button";
@@ -224,11 +224,12 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
       </div>
 
       <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Filtre lead-uri">
+        {multi("categorie", "Categorie", "categorie", CATEGORIES.map((c) => [c, CATEGORY_LABEL[c]]))}
         {multi("zona", "Zonă", "zona", ZONES.map((z) => [z, ZONE_LABEL[z]]))}
         {multi("prioritate", "Prioritate", "prioritate", PRIORITIES.map((p) => [p, p === "A" ? "A · de sunat" : p === "B" ? "B · de verificat" : "C · are site"]))}
         {multi("site", "Status site", "site", WEBSITE_STATUSES.map((w) => [w, WEBSITE_LABEL[w]]))}
         {multi("etapa", "Etapă", "etapa", STAGES.map((st) => [st, STAGE_LABEL[st]]))}
-        {multi("tip", "Tip", "tip", TYPES.map((t) => [t, TYPE_LABEL[t]]))}
+        {multi("tip", "Tip cazare", "tip", TYPES.map((t) => [t, TYPE_LABEL[t]]))}
         <FilterDropdown label="Altele" count={otherCount} wide {...menu("altele")}>
           <div className="flex flex-col gap-2 p-1.5">
             <Select aria-label="Telefon" value={sp.get("telefon") ?? ""} onChange={(e) => set("telefon", e.target.value || null)}>

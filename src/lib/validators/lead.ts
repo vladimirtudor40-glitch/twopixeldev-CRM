@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PRIORITIES, SOURCES, TYPES, WEBSITE_STATUSES, ZONES } from "@/lib/labels";
+import { CATEGORIES, PRIORITIES, SOURCES, TYPES, WEBSITE_STATUSES, ZONES } from "@/lib/labels";
 
 const optionalText = (max = 500) =>
   z.string().trim().max(max, `Maxim ${max} caractere.`).optional().transform((v) => (v ? v : null));
@@ -30,8 +30,10 @@ const optionalInt = (max: number) =>
 
 export const leadFormSchema = z
   .object({
-    name: z.string().trim().min(2, "Scrie numele unității.").max(200),
+    name: z.string().trim().min(2, "Scrie numele lead-ului.").max(200),
+    category: z.enum(CATEGORIES as [string, ...string[]]),
     type: z.enum(TYPES as [string, ...string[]]),
+    businessType: optionalText(80),
     zone: z.enum(ZONES as [string, ...string[]]),
     address: optionalText(300),
     latitude: optionalNumber(-90, 90, "Latitudine între -90 și 90."),

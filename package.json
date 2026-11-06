@@ -1,6 +1,6 @@
 {
   "name": "twopixeldev-crm",
-  "version": "0.3.4",
+  "version": "0.3.6",
   "private": true,
   "description": "twopixeldev CRM: evidența unităților de cazare de pe litoral, de la prima găsire până devin clienți.",
   "scripts": {

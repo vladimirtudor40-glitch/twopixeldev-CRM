@@ -36,6 +36,15 @@ enum Role {
   AGENT_VANZARI
 }
 
+/// Tipul de afacere al lead-ului. Toate categoriile stau în aceeași tabelă Lead.
+enum LeadCategory {
+  HOTELURI // unități de cazare: hoteluri, pensiuni, vile, apartamente etc.
+  BARBERSHOPURI
+  RESTAURANTE
+  ACTIVITATI
+  SALOANE_BEAUTY
+}
+
 enum PropertyType {
   HOTEL
   PENSIUNE_VILA
@@ -331,7 +340,9 @@ model Lead {
   // Identificare
   name           String
   nameNormalized String // fără diacritice, lowercase, fără prefixe tip „pensiunea”, „vila”
-  type           PropertyType @default(PENSIUNE_VILA)
+  category       LeadCategory @default(HOTELURI)
+  type           PropertyType @default(PENSIUNE_VILA) // tipul unității de cazare; ALTUL la celelalte categorii
+  businessType   String? // la celelalte categorii: tipul liber din sursă (ex. „Cafenea”, „Beach club / plaja”)
   zone           Zone
   address        String?
   latitude       Decimal?     @db.Decimal(9, 6)
@@ -416,6 +427,7 @@ model Lead {
   tags         LeadTag[]
   importRows   ImportRow[]
 
+  @@index([category, priority])
   @@index([zone, priority])
   @@index([stage, stageOrder])
   @@index([ownerId, stage])

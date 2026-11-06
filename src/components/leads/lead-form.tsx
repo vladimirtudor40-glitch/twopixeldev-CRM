@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  PRIORITIES, PRIORITY_LABEL, SOURCES, SOURCE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL,
+  CATEGORIES, CATEGORY_LABEL, PRIORITIES, PRIORITY_LABEL, SOURCES, SOURCE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL,
 } from "@/lib/labels";
 import { leadFormSchema, type LeadFormInput } from "@/lib/validators/lead";
 import { createLead, updateLead } from "@/server/actions/leads";
@@ -25,7 +25,7 @@ export function LeadForm({ leadId, defaults, users, canChangeOwner }: Props) {
   const router = useRouter();
   const [serverError, setServerError] = useState<string | null>(null);
   const [duplicate, setDuplicate] = useState<string | null>(null);
-  const { register, handleSubmit, setError, formState: { errors, isSubmitting } } = useForm<LeadFormInput>({
+  const { register, handleSubmit, setError, watch, formState: { errors, isSubmitting } } = useForm<LeadFormInput>({
     resolver: zodResolver(leadFormSchema, undefined, { raw: true }) as never,
     defaultValues: defaults,
   });
@@ -46,22 +46,32 @@ export function LeadForm({ leadId, defaults, users, canChangeOwner }: Props) {
     }
   };
 
+  // Câmpurile specifice cazării (tip, stele, camere, locuri) apar doar la categoria „Hoteluri”.
+  const isLodging = watch("category") === "HOTELURI";
+
   const err = (k: keyof LeadFormInput) => errors[k]?.message as string | undefined;
   const reg = (k: keyof LeadFormInput) => ({ id: `f-${k}`, "aria-invalid": !!errors[k], ...register(k) });
 
   return (
     <form onSubmit={handleSubmit((v) => submit(v))} className="flex flex-col gap-4" noValidate>
       <Panel>
-        <h2 className="mb-3 font-display text-base font-bold">Unitatea</h2>
+        <h2 className="mb-3 font-display text-base font-bold">Lead-ul</h2>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Nume *" htmlFor="f-name" error={err("name")} className="sm:col-span-2 lg:col-span-1"><Input {...reg("name")} autoFocus={!leadId} /></Field>
-          <Field label="Tip" htmlFor="f-type"><Select {...reg("type")}>{TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</Select></Field>
+          <Field label="Categorie" htmlFor="f-category"><Select {...reg("category")}>{CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABEL[c]}</option>)}</Select></Field>
+          {isLodging
+            ? <Field label="Tip unitate" htmlFor="f-type"><Select {...reg("type")}>{TYPES.map((t) => <option key={t} value={t}>{TYPE_LABEL[t]}</option>)}</Select></Field>
+            : <Field label="Tip" htmlFor="f-businessType" error={err("businessType")}><Input {...reg("businessType")} placeholder="ex. Cafenea, Beach club" /></Field>}
           <Field label="Zonă" htmlFor="f-zone"><Select {...reg("zone")}>{ZONES.map((z) => <option key={z} value={z}>{ZONE_LABEL[z]}</option>)}</Select></Field>
           <Field label="Adresă" htmlFor="f-address" error={err("address")} className="sm:col-span-2"><Input {...reg("address")} /></Field>
-          <Field label="Categorie (stele / flori)" htmlFor="f-categoryMinistry" error={err("categoryMinistry")}><Input {...reg("categoryMinistry")} placeholder="ex. 3 flori" /></Field>
-          <Field label="Stele (OSM)" htmlFor="f-starsOsm" error={err("starsOsm")}><Input {...reg("starsOsm")} inputMode="numeric" /></Field>
-          <Field label="Camere" htmlFor="f-roomsCount" error={err("roomsCount")}><Input {...reg("roomsCount")} inputMode="numeric" /></Field>
-          <Field label="Locuri" htmlFor="f-placesCount" error={err("placesCount")}><Input {...reg("placesCount")} inputMode="numeric" /></Field>
+          {isLodging && (
+            <>
+              <Field label="Categorie (stele / flori)" htmlFor="f-categoryMinistry" error={err("categoryMinistry")}><Input {...reg("categoryMinistry")} placeholder="ex. 3 flori" /></Field>
+              <Field label="Stele (OSM)" htmlFor="f-starsOsm" error={err("starsOsm")}><Input {...reg("starsOsm")} inputMode="numeric" /></Field>
+              <Field label="Camere" htmlFor="f-roomsCount" error={err("roomsCount")}><Input {...reg("roomsCount")} inputMode="numeric" /></Field>
+              <Field label="Locuri" htmlFor="f-placesCount" error={err("placesCount")}><Input {...reg("placesCount")} inputMode="numeric" /></Field>
+            </>
+          )}
           <Field label="Latitudine" htmlFor="f-latitude" error={err("latitude")}><Input {...reg("latitude")} inputMode="decimal" placeholder="44.2169" /></Field>
           <Field label="Longitudine" htmlFor="f-longitude" error={err("longitude")}><Input {...reg("longitude")} inputMode="decimal" placeholder="28.6254" /></Field>
         </div>

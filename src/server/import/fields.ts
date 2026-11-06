@@ -1,4 +1,4 @@
-import type { LeadSource, Priority, PropertyType, WebsiteStatus, Zone } from "@prisma/client";
+import type { LeadCategory, LeadSource, Priority, PropertyType, WebsiteStatus, Zone } from "@prisma/client";
 import {
   normalizeName, normalizePhone, normalizeText, normalizeUrl, osmIdFromUrl, parseIntLoose, parseNumber,
 } from "@/lib/normalize";
@@ -8,7 +8,10 @@ export type LeadImportData = {
   name: string;
   nameNormalized: string;
   zone: Zone;
+  category: LeadCategory;
   type?: PropertyType;
+  /** tipul liber din fișier (ex. „Cafenea”), păstrat doar la categoriile din afara cazării */
+  businessType?: string;
   address?: string;
   latitude?: number;
   longitude?: number;
@@ -36,7 +39,7 @@ export type LeadImportData = {
   manualCheckNote?: string;
 };
 
-type Draft = Partial<LeadImportData> & { _name?: string; _zoneText?: string };
+type Draft = Partial<LeadImportData> & { _name?: string; _zoneText?: string; _typeText?: string };
 
 export type TargetField = {
   key: string;
@@ -64,6 +67,18 @@ export function parseType(v: string): PropertyType | undefined {
   if (t.includes("pensiune") || t.includes("vila") || t.includes("villa") || t.includes("guest")) return "PENSIUNE_VILA";
   if (t.includes("hotel")) return "HOTEL";
   return "ALTUL";
+}
+
+/** „Categorie lead” din fișier: Hoteluri / Barbershopuri / Restaurante / Activități / Saloane beauty. */
+export function parseCategory(v: string): LeadCategory | undefined {
+  const t = normalizeText(v);
+  if (!t) return undefined;
+  if (t.includes("barber") || t.includes("frizer")) return "BARBERSHOPURI";
+  if (t.includes("restaurant") || t.includes("cafenea") || t.includes("bar") || t.includes("fast food")) return "RESTAURANTE";
+  if (t.includes("activitat") || t.includes("activity") || t.includes("atractie")) return "ACTIVITATI";
+  if (t.includes("salon") || t.includes("beauty") || t.includes("coafura") || t.includes("infrumusetare")) return "SALOANE_BEAUTY";
+  if (t.includes("hotel") || t.includes("cazare") || t.includes("pensiun")) return "HOTELURI";
+  return undefined;
 }
 
 export function parseZone(v: string): Zone {
@@ -127,7 +142,8 @@ export function classifyLinks(v: string, out: Draft): void {
 export const TARGET_FIELDS: TargetField[] = [
   { key: "priority", label: "Prioritate (A/B/C)", aliases: ["prioritate", "priority"], apply: (v, o) => { o.priority = parsePriority(v); } },
   { key: "name", label: "Nume", aliases: ["nume", "denumire", "name", "unitate", "denumire unitate"], apply: (v, o) => { o._name = str(v); } },
-  { key: "type", label: "Tip", aliases: ["tip", "type", "tip unitate", "tip structura"], apply: (v, o) => { o.type = parseType(v); } },
+  { key: "category", label: "Categorie lead", aliases: ["categorie lead", "categorie crm", "tip lead"], apply: (v, o) => { o.category = parseCategory(v); } },
+  { key: "type", label: "Tip", aliases: ["tip", "type", "tip unitate", "tip structura"], apply: (v, o) => { o.type = parseType(v); o._typeText = str(v) || undefined; } },
   { key: "zone", label: "Zonă", aliases: ["zona", "zone", "localitate", "statiune"], apply: (v, o) => { o._zoneText = v; } },
   { key: "address", label: "Adresă", aliases: ["adresa", "address"], apply: (v, o) => { o.address = str(v) || undefined; } },
   {
@@ -203,14 +219,22 @@ export function mapRow(raw: Record<string, string>, columnMap: ColumnMap): Mappe
   }
   const name = draft._name?.trim();
   if (!name) return { ok: false, error: "Rândul nu are nume." };
-  const { _name, _zoneText, ...rest } = draft;
+  const { _name, _zoneText, _typeText, ...rest } = draft;
   void _name;
+  // Fără coloana „Categorie lead” (exportul de cazare), lead-ul e la Hoteluri.
+  const category = rest.category ?? "HOTELURI";
   const data: LeadImportData = {
     ...rest,
+    category,
     name,
     nameNormalized: normalizeName(name),
     zone: parseZone(_zoneText ?? ""),
   };
+  // Tipurile de cazare n-au sens la restaurante, barbershopuri etc.: păstrăm textul din fișier.
+  if (category !== "HOTELURI") {
+    delete data.type;
+    if (_typeText) data.businessType = _typeText;
+  }
   for (const k of Object.keys(data) as (keyof LeadImportData)[]) {
     if (data[k] === undefined) delete data[k];
   }
