@@ -35,7 +35,16 @@ jobs:
         run: npm test
 
       - name: Construiește installer-ul
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: npm run desktop:dist
+
+      # Pe tag-uri v*: publică în GitHub Releases installer-ul + latest.yml, de unde programul instalat
+      # își ia singur actualizările
+      - name: Construiește și publică versiunea (actualizare automată)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm run desktop:release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Salvează installer-ul
         uses: actions/upload-artifact@v4
@@ -44,10 +53,3 @@ jobs:
           path: dist-desktop/installer/*.exe
           if-no-files-found: error
           retention-days: 30
-
-      - name: Publică versiunea (doar pentru tag-uri v*)
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist-desktop/installer/*.exe
-          generate_release_notes: true

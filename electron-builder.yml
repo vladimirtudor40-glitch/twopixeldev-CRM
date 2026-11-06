@@ -18,6 +18,12 @@ extraResources:
     to: migrations
     filter:
       - "**/*"
+# Actualizări automate: programul citește versiunile publicate în GitHub Releases (repo public)
+publish:
+  provider: github
+  owner: vladimirtudor40-glitch
+  repo: twopixeldev-CRM
+  releaseType: release
 win:
   target:
     - target: nsis

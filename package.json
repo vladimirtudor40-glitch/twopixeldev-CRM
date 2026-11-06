@@ -1,6 +1,6 @@
 {
   "name": "twopixeldev-crm",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "description": "twopixeldev CRM: evidența unităților de cazare de pe litoral, de la prima găsire până devin clienți.",
   "scripts": {
@@ -17,7 +17,8 @@
     "postinstall": "prisma generate",
     "desktop:prepare": "node desktop/build.mjs",
     "desktop:start": "node desktop/build.mjs && electron desktop/app",
-    "desktop:dist": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish never"
+    "desktop:dist": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish never",
+    "desktop:release": "npm run build && node desktop/build.mjs && electron-builder --win --x64 --publish always"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -50,6 +51,7 @@
     "autoprefixer": "10.4.21",
     "electron": "44.9.0",
     "electron-builder": "26.17.0",
+    "electron-updater": "6.8.11",
     "esbuild": "0.28.2",
     "eslint": "9.36.0",
     "eslint-config-next": "15.5.28",

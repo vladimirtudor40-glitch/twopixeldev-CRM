@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, List, Upload } from "lucide-react";
+import { LayoutDashboard, List, Upload, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/", label: "Panou", icon: LayoutDashboard, exact: true },
   { href: "/leaduri", label: "Lead-uri", icon: List },
   { href: "/import", label: "Import", icon: Upload, adminOnly: true },
+  { href: "/utilizatori", label: "Utilizatori", icon: Users, adminOnly: true },
 ];
 
 export function SideNav({ isAdmin }: { isAdmin: boolean }) {

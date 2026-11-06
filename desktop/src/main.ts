@@ -12,6 +12,7 @@ import { createFirstAdmin, inspectDatabase, migrateDatabase, normalizeDatabaseUr
 import { logsDir, migrationsDir } from "./paths";
 import type { DesktopState, Result, StartStatus } from "./preload";
 import { serverUrl, startServer, stopServer } from "./server";
+import { checkForUpdatesManually, initUpdater } from "./updater";
 
 const APP_NAME = "twopixeldev CRM";
 const EXTERNAL_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:", "sms:", "whatsapp:", "geo:"]);
@@ -310,6 +311,8 @@ function buildMenu(): void {
     {
       label: "Ajutor",
       submenu: [
+        { label: "Caută actualizări", click: () => checkForUpdatesManually() },
+        { type: "separator" },
         {
           label: `Despre ${APP_NAME}`,
           click: () =>
@@ -345,6 +348,7 @@ if (!app.requestSingleInstanceLock()) {
     registerIpc();
     buildMenu();
     void boot();
+    initUpdater(() => mainWindow);
     app.on("activate", () => {
       if (BrowserWindow.getAllWindows().length === 0) void boot();
     });
