@@ -1,5 +1,5 @@
 import type {
-  ContactChannel, ContactRole, ImportRowAction, ImportStatus, LeadSource, PipelineStage,
+  ContactChannel, ContactRole, ImportRowAction, ImportStatus, LeadCategory, LeadSource, PipelineStage,
   Priority, PropertyType, Role, WebsiteStatus, Zone, AuditAction,
 } from "@prisma/client";
 
@@ -11,6 +11,23 @@ export const ZONE_LABEL: Record<Zone, string> = {
   EFORIE_SUD: "Eforie Sud",
   AGIGEA: "Agigea",
   ALTA: "Altă zonă",
+};
+
+export const CATEGORY_LABEL: Record<LeadCategory, string> = {
+  HOTELURI: "Hoteluri",
+  BARBERSHOPURI: "Barbershopuri",
+  RESTAURANTE: "Restaurante",
+  ACTIVITATI: "Activități",
+  SALOANE_BEAUTY: "Saloane beauty",
+};
+
+/** Numele la singular, pentru coloana „Categorie” din tabel și fișa lead-ului. */
+export const CATEGORY_SINGULAR: Record<LeadCategory, string> = {
+  HOTELURI: "Hotel / cazare",
+  BARBERSHOPURI: "Barbershop",
+  RESTAURANTE: "Restaurant",
+  ACTIVITATI: "Activitate",
+  SALOANE_BEAUTY: "Salon beauty",
 };
 
 export const TYPE_LABEL: Record<PropertyType, string> = {
@@ -126,6 +143,8 @@ export const AUDIT_LABEL: Record<AuditAction, string> = {
 /** Etichete în română pentru câmpurile lead-ului (formular, audit, import). */
 export const LEAD_FIELD_LABEL: Record<string, string> = {
   name: "Nume",
+  category: "Categorie",
+  businessType: "Tip (liber)",
   type: "Tip",
   zone: "Zonă",
   address: "Adresă",
@@ -163,6 +182,7 @@ export const LEAD_FIELD_LABEL: Record<string, string> = {
 };
 
 export const ZONES = Object.keys(ZONE_LABEL) as Zone[];
+export const CATEGORIES = Object.keys(CATEGORY_LABEL) as LeadCategory[];
 export const TYPES = Object.keys(TYPE_LABEL) as PropertyType[];
 export const WEBSITE_STATUSES = Object.keys(WEBSITE_LABEL) as WebsiteStatus[];
 export const PRIORITIES = Object.keys(PRIORITY_LABEL) as Priority[];

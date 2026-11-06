@@ -14,7 +14,7 @@ export async function refreshDerivedFields(db: Db, ids: string[]) {
     const leads = await db.lead.findMany({
       where: { id: { in: ids.slice(i, i + CHUNK) } },
       select: {
-        id: true, name: true, zone: true, address: true, phone: true, email: true, operatorName: true,
+        id: true, name: true, zone: true, businessType: true, address: true, phone: true, email: true, operatorName: true,
         operatorCui: true, websiteUrl: true, contacts: { select: { name: true, phone: true, email: true } },
         tags: { select: { tag: { select: { name: true } } } },
       },
@@ -29,7 +29,7 @@ export async function refreshDerivedFields(db: Db, ids: string[]) {
           phoneNormalized,
           dedupeKey: dedupeKey(nameNormalized, l.zone, phoneNormalized),
           searchText: buildSearchText([
-            l.name, l.address, ZONE_LABEL[l.zone], l.phone, l.email, l.operatorName, l.operatorCui, l.websiteUrl,
+            l.name, l.businessType, l.address, ZONE_LABEL[l.zone], l.phone, l.email, l.operatorName, l.operatorCui, l.websiteUrl,
             ...l.contacts.flatMap((c) => [c.name, c.phone, c.email]),
             ...l.tags.map((t) => t.tag.name),
           ]),
