@@ -136,6 +136,11 @@ async function boot(): Promise<void> {
   const win = getWindow();
   startStatus = { text: "Mă conectez la baza de date…" };
   await win.loadURL(pageUrl("start.html"));
+  // Serverul aplicației pornește în paralel cu verificarea bazei de date (fiecare durează ~1 s);
+  // pagina se deschide abia după ce baza e verificată și, la nevoie, actualizată.
+  const existing = serverUrl();
+  const server = existing ? Promise.resolve(existing) : startServer(config);
+  server.catch(() => undefined); // eroarea e tratată mai jos, la await
   try {
     const status = await inspectDatabase(config.databaseUrl, migrationsDir());
     if (run !== bootRun) return;
@@ -144,11 +149,14 @@ async function boot(): Promise<void> {
       await migrateDatabase(config.databaseUrl, migrationsDir(), (line) => setStartStatus({ text: line }));
     }
     if (status.userCount === 0) {
+      // serverul pornit degeaba se oprește, ca ecranul de configurare să poată schimba baza de date
+      await server.catch(() => undefined);
+      await stopServer();
       await showSetup("Baza de date nu are niciun utilizator. Creează contul de administrator.");
       return;
     }
     setStartStatus({ text: "Pornesc aplicația…" });
-    const url = serverUrl() ?? (await startServer(config));
+    const url = await server;
     if (run !== bootRun) return;
     await win.loadURL(`${url}/`);
   } catch (e) {

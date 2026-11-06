@@ -1,40 +1,60 @@
 import Link from "next/link";
+import type { PipelineStage, Priority, Zone } from "@prisma/client";
 import { Phone } from "lucide-react";
 import { PriorityBadge, WebsiteBadge } from "@/components/ui/badges";
 import { PageHeader, Panel } from "@/components/ui/page-header";
 import { PRIORITIES, STAGES, STAGE_COLOR, STAGE_LABEL, ZONES, ZONE_LABEL } from "@/lib/labels";
 import { prisma } from "@/lib/prisma";
 import { formatDateTime, formatNumber } from "@/lib/utils";
-import { requireUser } from "@/server/session";
+import { requireUser, sessionUserId } from "@/server/session";
 
 const PRIO_COLOR = { A: "#BFA181", B: "#8C7A5E", C: "#3A5470" } as const;
 
+type CountRow = {
+  zone: Zone; priority: Priority; stage: PipelineStage;
+  n: number; with_phone: number; opt_out: number; mine: number; to_call: number;
+};
+
 export default async function DashboardPage() {
-  const user = await requireUser();
+  const userId = await sessionUserId();
   const active = { archivedAt: null };
-  const [total, byZonePrio, byStage, withPhone, toCall, optOut, lastImport, mine] = await Promise.all([
-    prisma.lead.count({ where: active }),
-    prisma.lead.groupBy({ by: ["zone", "priority"], where: active, _count: true }),
-    prisma.lead.groupBy({ by: ["stage"], where: active, _count: true }),
-    prisma.lead.count({ where: { ...active, phoneNormalized: { not: null } } }),
+  const toCallWhere = { ...active, priority: "A", stage: "NOU", doNotContact: false, phoneNormalized: { not: null } } as const;
+  // Toate cifrele panoului dintr-o singură interogare (grupată pe zonă, prioritate, etapă),
+  // cu enum-urile convertite în text (altfel Prisma întreabă baza separat de tipul fiecărui enum),
+  // pornită odată cu restul: cu baza de date la distanță, fiecare interogare în plus costă un drum dus-întors.
+  const [user, counts, toCall, lastImport] = await Promise.all([
+    requireUser(),
+    prisma.$queryRaw<CountRow[]>`
+      SELECT "zone"::text AS zone, "priority"::text AS priority, "stage"::text AS stage,
+        COUNT(*)::int AS n,
+        COUNT(*) FILTER (WHERE "phoneNormalized" IS NOT NULL)::int AS with_phone,
+        COUNT(*) FILTER (WHERE "doNotContact")::int AS opt_out,
+        COUNT(*) FILTER (WHERE "ownerId" = ${userId})::int AS mine,
+        COUNT(*) FILTER (WHERE "priority" = 'A' AND "stage" = 'NOU' AND NOT "doNotContact" AND "phoneNormalized" IS NOT NULL)::int AS to_call
+      FROM "Lead"
+      WHERE "archivedAt" IS NULL
+      GROUP BY "zone", "priority", "stage"`,
     prisma.lead.findMany({
-      where: { ...active, priority: "A", stage: "NOU", doNotContact: false, phoneNormalized: { not: null } },
+      where: toCallWhere,
       orderBy: [{ zone: "asc" }, { nameNormalized: "asc" }],
       take: 10,
       select: { id: true, name: true, zone: true, phone: true, websiteStatus: true },
     }),
-    prisma.lead.count({ where: { ...active, doNotContact: true } }),
     prisma.importBatch.findFirst({ where: { status: "FINALIZAT" }, orderBy: { finishedAt: "desc" } }),
-    prisma.lead.count({ where: { ...active, ownerId: user.id } }),
   ]);
-  const toCallTotal = await prisma.lead.count({ where: { ...active, priority: "A", stage: "NOU", doNotContact: false, phoneNormalized: { not: null } } });
+  const sum = (rows: CountRow[], key: "n" | "with_phone" | "opt_out" | "mine" | "to_call") => rows.reduce((a, r) => a + r[key], 0);
+  const total = sum(counts, "n");
+  const withPhone = sum(counts, "with_phone");
+  const optOut = sum(counts, "opt_out");
+  const mine = sum(counts, "mine");
+  const toCallTotal = sum(counts, "to_call");
 
-  const cell = (z: string, p: string) => byZonePrio.find((r) => r.zone === z && r.priority === p)?._count ?? 0;
+  const cell = (z: string, p: string) => sum(counts.filter((r) => r.zone === z && r.priority === p), "n");
   const zoneRows = ZONES.map((z) => ({ z, counts: PRIORITIES.map((p) => cell(z, p)) }))
     .map((r) => ({ ...r, total: r.counts.reduce((a, b) => a + b, 0) }))
     .filter((r) => r.total > 0);
   const zmax = Math.max(1, ...zoneRows.map((r) => r.total));
-  const stageCount = (s: string) => byStage.find((r) => r.stage === s)?._count ?? 0;
+  const stageCount = (s: string) => sum(counts.filter((r) => r.stage === s), "n");
 
   const today = new Intl.DateTimeFormat("ro-RO", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
 

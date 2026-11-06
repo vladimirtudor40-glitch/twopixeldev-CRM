@@ -15,7 +15,9 @@
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
+  // relationJoins: relațiile (include/select) vin în aceeași interogare SQL, nu în câte una separată;
+  // contează mult cu baza de date la distanță (Supabase), unde fiecare interogare costă un drum dus-întors.
+  previewFeatures = ["postgresqlExtensions", "relationJoins"]
 }
 
 datasource db {

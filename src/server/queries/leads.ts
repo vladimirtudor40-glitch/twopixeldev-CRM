@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import type { PipelineStage, Prisma, Priority, PropertyType, WebsiteStatus, Zone } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -96,7 +97,8 @@ export async function listLeads(f: LeadFilters, currentUserId: string) {
   return { total, rows, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
-export async function getLeadDetail(id: string) {
+/** Cu cache pe cerere: titlul paginii (generateMetadata) și pagina folosesc aceeași interogare. */
+export const getLeadDetail = cache(async (id: string) => {
   return prisma.lead.findUnique({
     where: { id },
     include: {
@@ -112,7 +114,7 @@ export async function getLeadDetail(id: string) {
       },
     },
   });
-}
+});
 
 export async function getLeadAudit(id: string) {
   return prisma.auditLog.findMany({

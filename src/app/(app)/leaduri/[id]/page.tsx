@@ -33,8 +33,7 @@ const fmtValue = (v: unknown) => (v === null || v === undefined || v === "" ? "â
 
 export default async function LeadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireUser();
-  const [lead, audit] = await Promise.all([getLeadDetail(id), getLeadAudit(id)]);
+  const [user, lead, audit] = await Promise.all([requireUser(), getLeadDetail(id), getLeadAudit(id)]);
   if (!lead) notFound();
   const canEdit = canEditLead(user, lead);
   const primary = lead.contacts.find((c) => c.isPrimary) ?? lead.contacts[0];
