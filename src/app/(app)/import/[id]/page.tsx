@@ -87,7 +87,7 @@ export default async function ImportBatchPage({ params, searchParams }: {
       <div className="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {tiles.map((t) => (
           <div key={t.label} className="rounded-xl border border-navy-600 bg-navy-800 px-4 py-3">
-            <div className="text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted">{t.label}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">{t.label}</div>
             <div className={cn("mt-1 font-display text-2xl font-extrabold tabular", t.cls)}>{formatNumber(t.value)}</div>
           </div>
         ))}
@@ -124,8 +124,8 @@ export default async function ImportBatchPage({ params, searchParams }: {
           ))}
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[880px] text-sm">
-            <thead><tr className="text-left text-[15px] uppercase tracking-[0.06em] text-ink-muted">
+          <table className="w-full min-w-[720px] text-sm">
+            <thead><tr className="text-left text-[11px] uppercase tracking-[0.06em] text-ink-muted">
               <th className="py-1.5 pr-3 font-semibold">Rând</th><th className="py-1.5 pr-3 font-semibold">Ce se întâmplă</th>
               <th className="py-1.5 pr-3 font-semibold">Unitate</th><th className="py-1.5 pr-3 font-semibold">Detalii</th>
               {preview && <th className="py-1.5 font-semibold"><span className="sr-only">Exclude</span></th>}
@@ -134,7 +134,7 @@ export default async function ImportBatchPage({ params, searchParams }: {
               {shown.slice(0, PREVIEW_LIMIT).map((r) => (
                 <tr key={r.rowNumber} className="border-t border-navy-600 align-top">
                   <td className="py-1.5 pr-3 tabular text-ink-muted">{r.rowNumber}</td>
-                  <td className="py-1.5 pr-3"><span className={cn("whitespace-nowrap rounded px-1.5 py-0.5 text-[15px] font-semibold", ACTION_STYLE[r.action])}>{IMPORT_ACTION_LABEL[r.action]}</span></td>
+                  <td className="py-1.5 pr-3"><span className={cn("whitespace-nowrap rounded px-1.5 py-0.5 text-[11px] font-semibold", ACTION_STYLE[r.action])}>{IMPORT_ACTION_LABEL[r.action]}</span></td>
                   <td className="py-1.5 pr-3">{r.leadId && !preview ? <Link href={`/leaduri/${r.leadId}`} className="hover:text-gold-hi">{r.name}</Link> : r.leadId ? <Link href={`/leaduri/${r.leadId}`} className="hover:text-gold-hi">{r.name}</Link> : (r.name ?? "—")}</td>
                   <td className="py-1.5 pr-3 text-xs text-ink-muted">
                     {r.error ?? (

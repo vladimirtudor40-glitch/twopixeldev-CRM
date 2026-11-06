@@ -32,8 +32,8 @@ export default async function ImportPage() {
           <h2 className="mb-3 font-display text-base font-bold">Importuri anterioare</h2>
           {batches.length === 0 ? <p className="text-sm text-ink-muted">Niciun import încă.</p> : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-sm">
-                <thead><tr className="text-left text-[15px] uppercase tracking-[0.06em] text-ink-muted">
+              <table className="w-full min-w-[520px] text-sm">
+                <thead><tr className="text-left text-[11px] uppercase tracking-[0.06em] text-ink-muted">
                   <th className="py-1.5 pr-3 font-semibold">Fișier</th><th className="py-1.5 pr-3 font-semibold">Status</th>
                   <th className="py-1.5 pr-3 font-semibold">Noi</th><th className="py-1.5 pr-3 font-semibold">Completate</th><th className="py-1.5 font-semibold">Când</th>
                 </tr></thead>

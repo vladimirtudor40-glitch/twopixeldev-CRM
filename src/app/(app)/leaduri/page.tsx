@@ -84,9 +84,9 @@ export default async function LeadsPage({ searchParams }: { searchParams: Promis
       ) : (
         <>
           <div className="hidden overflow-x-auto rounded-xl border border-navy-600 bg-navy-800 md:block">
-            <table className="w-full min-w-[1320px] border-collapse text-sm">
+            <table className="w-full min-w-[1080px] border-collapse text-sm">
               <thead>
-                <tr className="bg-[#0D1F33] text-left text-[15px] uppercase tracking-[0.06em] text-ink-muted">
+                <tr className="bg-[#0D1F33] text-left text-[11px] uppercase tracking-[0.06em] text-ink-muted">
                   {SORT_COLUMNS.map((c) => (
                     <th key={c.key} aria-sort={ariaSort(c.key)} className="px-3 py-2.5 font-semibold">
                       <Link href={sortLink(c.key)} scroll={false}>{c.label}{arrow(c.key)}</Link>

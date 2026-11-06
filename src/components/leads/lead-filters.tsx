@@ -93,7 +93,7 @@ function FilterDropdown({ id, label, count, open, onOpenChange, children, wide }
       >
         {label}
         {active && (
-          <span className="tabular rounded-full bg-teal px-1.5 text-[13px] leading-5 text-white" aria-label={`${count} ${count === 1 ? "selectat" : "selectate"}`}>
+          <span className="tabular rounded-full bg-teal px-1.5 text-[11px] leading-4 text-white" aria-label={`${count} ${count === 1 ? "selectat" : "selectate"}`}>
             {count}
           </span>
         )}
@@ -278,7 +278,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
                 if (r.ok) { setSaving(false); setViewName(""); router.refresh(); }
               }}
             >
-              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-10 w-56" />
+              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-8 w-48" />
               <Button size="sm" type="submit" variant="primary">Salvează</Button>
               <Button size="sm" variant="ghost" onClick={() => setSaving(false)}>Renunță</Button>
             </form>
@@ -290,7 +290,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
       </div>
       {views.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Vederi salvate">
-          <span className="w-full text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
+          <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
           {views.map((v) => (
             <span key={v.id} className="inline-flex items-center">
               <Chip pressed={currentQuery === v.query} onClick={() => { setQ(new URLSearchParams(v.query).get("q") ?? ""); push(new URLSearchParams(v.query)); }}>
