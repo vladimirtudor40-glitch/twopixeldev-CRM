@@ -11,7 +11,7 @@ const variants: Record<Variant, string> = {
   ghost: "bg-transparent text-ink border-transparent hover:bg-navy-800",
   danger: "bg-transparent text-[#F2A49D] border-danger/50 hover:bg-danger/10",
 };
-const sizes: Record<Size, string> = { sm: "h-8 px-2.5 text-xs", md: "h-9 px-3.5 text-sm" };
+const sizes: Record<Size, string> = { sm: "h-10 px-3 text-xs", md: "h-11 px-4 text-sm" };
 
 export function buttonClass(variant: Variant = "secondary", size: Size = "md", className?: string) {
   return cn(

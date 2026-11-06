@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Bookmark, Search, X } from "lucide-react";
-import { PRIORITIES, STAGES, STAGE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL } from "@/lib/labels";
+import { Bookmark, Check, ChevronDown, Search, X } from "lucide-react";
+import { CATEGORIES, CATEGORY_LABEL, PRIORITIES, STAGES, STAGE_LABEL, TYPES, TYPE_LABEL, WEBSITE_LABEL, WEBSITE_STATUSES, ZONES, ZONE_LABEL } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import { deleteView, saveView } from "@/server/actions/views";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,123 @@ function Chip({ pressed, onClick, children }: { pressed: boolean; onClick: () =>
   );
 }
 
+
+/**
+ * Buton de filtru din toolbar: arată categoria (ex. „Zonă”) cu chevron; la click deschide
+ * un popover cu opțiunile. Popover-ul e deasupra tabelului (z-40) și se închide la click
+ * în afară sau la Escape.
+ */
+function FilterDropdown({ id, label, count, open, onOpenChange, children, wide }: {
+  id: string;
+  label: string;
+  count: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  children: React.ReactNode;
+  wide?: boolean;
+}) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [alignRight, setAlignRight] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) onOpenChange(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onOpenChange(false);
+        rootRef.current?.querySelector<HTMLButtonElement>("button[aria-haspopup]")?.focus();
+      }
+    };
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open, onOpenChange]);
+
+  // Dacă meniul ar ieși din fereastră în dreapta, îl aliniem la marginea dreaptă a butonului.
+  useLayoutEffect(() => {
+    if (!open) { setAlignRight(false); return; }
+    const root = rootRef.current;
+    const panel = panelRef.current;
+    if (!root || !panel) return;
+    const left = root.getBoundingClientRect().left;
+    setAlignRight(left + panel.offsetWidth > document.documentElement.clientWidth - 8);
+  }, [open]);
+
+  const active = count > 0;
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        aria-controls={`filtru-${id}`}
+        onClick={() => onOpenChange(!open)}
+        className={cn(
+          "inline-flex h-10 items-center gap-1.5 whitespace-nowrap rounded-lg border px-3 text-xs font-semibold transition-colors",
+          "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold",
+          active ? "border-teal bg-teal/15 text-ink" : "border-navy-600 bg-navy-700 text-ink hover:border-teal",
+          open && "border-teal",
+        )}
+      >
+        {label}
+        {active && (
+          <span className="tabular rounded-full bg-teal px-1.5 text-[13px] leading-5 text-white" aria-label={`${count} ${count === 1 ? "selectat" : "selectate"}`}>
+            {count}
+          </span>
+        )}
+        <ChevronDown size={15} aria-hidden className={cn("text-ink-muted transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div
+          ref={panelRef}
+          id={`filtru-${id}`}
+          role="group"
+          aria-label={label}
+          className={cn(
+            "absolute top-full z-40 mt-1.5 max-h-[60vh] max-w-[calc(100vw-2rem)] overflow-y-auto rounded-xl border border-navy-600 bg-navy-800 p-1.5 shadow-xl shadow-black/40",
+            wide ? "w-80" : "min-w-[15rem]",
+            alignRight ? "right-0" : "left-0",
+          )}
+        >
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function OptionItem({ checked, onClick, children }: { checked: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={onClick}
+      className={cn(
+        "flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-ink hover:bg-navy-700",
+        "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-gold",
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "flex size-[18px] shrink-0 items-center justify-center rounded border",
+          checked ? "border-teal bg-teal text-white" : "border-navy-600 bg-navy",
+        )}
+      >
+        {checked && <Check size={13} strokeWidth={3} />}
+      </span>
+      <span className="min-w-0 flex-1">{children}</span>
+    </button>
+  );
+}
+
 export function LeadFilters({ views, users }: { views: View[]; users: { id: string; name: string | null; email: string }[] }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -36,7 +153,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
   const [viewName, setViewName] = useState("");
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const push = (next: URLSearchParams) => {
@@ -69,14 +186,28 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
   current.delete("pagina");
   const currentQuery = current.toString();
   const anyFilter = currentQuery.length > 0;
-  const activeCount = [...current.keys()].filter((k) => !["q", "sort", "dir"].includes(k)).length;
 
-  const Group = ({ label, k, options }: { label: string; k: string; options: [string, string][] }) => (
-    <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={label}>
-      <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">{label}</span>
-      {options.map(([v, l]) => <Chip key={v} pressed={has(k, v)} onClick={() => toggle(k, v)}>{l}</Chip>)}
-    </div>
+  const values = (key: string) => (sp.get(key) ?? "").split(",").filter(Boolean);
+  const menu = (id: string) => ({
+    id,
+    open: openMenu === id,
+    onOpenChange: (o: boolean) => setOpenMenu(o ? id : null),
+  });
+
+  const multi = (id: string, label: string, k: string, options: [string, string][]) => (
+    <FilterDropdown key={id} label={label} count={values(k).length} {...menu(id)}>
+      {options.map(([v, l]) => <OptionItem key={v} checked={has(k, v)} onClick={() => toggle(k, v)}>{l}</OptionItem>)}
+      {values(k).length > 0 && (
+        <button type="button" onClick={() => set(k, null)}
+          className="mt-1 w-full rounded-lg border-t border-navy-600 px-2.5 pb-1 pt-2 text-left text-xs text-ink-muted hover:text-ink">
+          Golește „{label}”
+        </button>
+      )}
+    </FilterDropdown>
   );
+
+  const OTHER_KEYS = ["telefon", "ultima", "responsabil", "optout", "arhivate"];
+  const otherCount = OTHER_KEYS.filter((k) => sp.get(k)).length;
 
   return (
     <div className={cn("mb-4 flex flex-col gap-3", pending && "opacity-80")}>
@@ -92,67 +223,45 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
         />
       </div>
 
-      {views.length > 0 && (
-        <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Vederi salvate">
-          <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
-          {views.map((v) => (
-            <span key={v.id} className="inline-flex items-center">
-              <Chip pressed={currentQuery === v.query} onClick={() => { setQ(new URLSearchParams(v.query).get("q") ?? ""); push(new URLSearchParams(v.query)); }}>
-                <Bookmark size={11} className="mr-1 inline" aria-hidden />{v.name}
-              </Chip>
-              {v.mine && (
-                <button type="button" aria-label={`Șterge vederea ${v.name}`} className="ml-0.5 rounded p-0.5 text-ink-muted hover:text-ink"
-                  onClick={async () => { await deleteView(v.id); router.refresh(); }}>
-                  <X size={12} />
-                </button>
-              )}
-            </span>
-          ))}
-        </div>
-      )}
+      <div className="flex flex-wrap items-center gap-2" role="toolbar" aria-label="Filtre lead-uri">
+        {multi("categorie", "Categorie", "categorie", CATEGORIES.map((c) => [c, CATEGORY_LABEL[c]]))}
+        {multi("zona", "Zonă", "zona", ZONES.map((z) => [z, ZONE_LABEL[z]]))}
+        {multi("prioritate", "Prioritate", "prioritate", PRIORITIES.map((p) => [p, p === "A" ? "A · de sunat" : p === "B" ? "B · de verificat" : "C · are site"]))}
+        {multi("site", "Status site", "site", WEBSITE_STATUSES.map((w) => [w, WEBSITE_LABEL[w]]))}
+        {multi("etapa", "Etapă", "etapa", STAGES.map((st) => [st, STAGE_LABEL[st]]))}
+        {multi("tip", "Tip cazare", "tip", TYPES.map((t) => [t, TYPE_LABEL[t]]))}
+        <FilterDropdown label="Altele" count={otherCount} wide {...menu("altele")}>
+          <div className="flex flex-col gap-2 p-1.5">
+            <Select aria-label="Telefon" value={sp.get("telefon") ?? ""} onChange={(e) => set("telefon", e.target.value || null)}>
+              <option value="">Telefon: oricare</option>
+              <option value="da">Are telefon</option>
+              <option value="nu">Fără telefon</option>
+            </Select>
+            <Select aria-label="Ultima interacțiune" value={sp.get("ultima") ?? ""} onChange={(e) => set("ultima", e.target.value || null)}>
+              <option value="">Ultima interacțiune: oricând</option>
+              <option value="niciodata">Niciodată contactate</option>
+              <option value="14">Necontactate de 14+ zile</option>
+              <option value="30">Necontactate de 30+ zile</option>
+            </Select>
+            <Select aria-label="Responsabil" value={sp.get("responsabil") ?? ""} onChange={(e) => set("responsabil", e.target.value || null)}>
+              <option value="">Responsabil: oricine</option>
+              <option value="eu">Ale mele</option>
+              <option value="liber">Fără responsabil</option>
+              {users.map((u) => <option key={u.id} value={u.id}>{u.name || u.email}</option>)}
+            </Select>
+            <Select aria-label="Nu mai contacta" value={sp.get("optout") ?? ""} onChange={(e) => set("optout", e.target.value || null)}>
+              <option value="">Opt-out: toate</option>
+              <option value="ascunde">Ascunde „Nu mai contacta”</option>
+              <option value="doar">Doar „Nu mai contacta”</option>
+            </Select>
+            <Select aria-label="Arhivă" value={sp.get("arhivate") ?? ""} onChange={(e) => set("arhivate", e.target.value || null)}>
+              <option value="">Active</option>
+              <option value="da">Arhivate</option>
+            </Select>
+          </div>
+        </FilterDropdown>
 
-      <Button size="sm" className="self-start md:hidden" aria-expanded={showFilters} aria-controls="lead-filter-groups" onClick={() => setShowFilters((v) => !v)}>
-        {showFilters ? "Ascunde filtrele" : `Filtre${activeCount ? ` (${activeCount} ${activeCount === 1 ? "activ" : "active"})` : ""}`}
-      </Button>
-      <div id="lead-filter-groups" className={cn("flex-col gap-3 md:flex", showFilters ? "flex" : "hidden")}>
-      <Group label="Zonă" k="zona" options={ZONES.map((z) => [z, ZONE_LABEL[z]])} />
-      <Group label="Prioritate" k="prioritate" options={PRIORITIES.map((p) => [p, p === "A" ? "A · de sunat" : p === "B" ? "B · de verificat" : "C · are site"])} />
-      <Group label="Status site" k="site" options={WEBSITE_STATUSES.map((w) => [w, WEBSITE_LABEL[w]])} />
-      <Group label="Etapă" k="etapa" options={STAGES.map((s) => [s, STAGE_LABEL[s]])} />
-      <Group label="Tip" k="tip" options={TYPES.map((t) => [t, TYPE_LABEL[t]])} />
-
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Altele</span>
-        <Select aria-label="Telefon" className="w-auto" value={sp.get("telefon") ?? ""} onChange={(e) => set("telefon", e.target.value || null)}>
-          <option value="">Telefon: oricare</option>
-          <option value="da">Are telefon</option>
-          <option value="nu">Fără telefon</option>
-        </Select>
-        <Select aria-label="Ultima interacțiune" className="w-auto" value={sp.get("ultima") ?? ""} onChange={(e) => set("ultima", e.target.value || null)}>
-          <option value="">Ultima interacțiune: oricând</option>
-          <option value="niciodata">Niciodată contactate</option>
-          <option value="14">Necontactate de 14+ zile</option>
-          <option value="30">Necontactate de 30+ zile</option>
-        </Select>
-        <Select aria-label="Responsabil" className="w-auto" value={sp.get("responsabil") ?? ""} onChange={(e) => set("responsabil", e.target.value || null)}>
-          <option value="">Responsabil: oricine</option>
-          <option value="eu">Ale mele</option>
-          <option value="liber">Fără responsabil</option>
-          {users.map((u) => <option key={u.id} value={u.id}>{u.name || u.email}</option>)}
-        </Select>
-        <Select aria-label="Nu mai contacta" className="w-auto" value={sp.get("optout") ?? ""} onChange={(e) => set("optout", e.target.value || null)}>
-          <option value="">Opt-out: toate</option>
-          <option value="ascunde">Ascunde „Nu mai contacta”</option>
-          <option value="doar">Doar „Nu mai contacta”</option>
-        </Select>
-        <Select aria-label="Arhivă" className="w-auto" value={sp.get("arhivate") ?? ""} onChange={(e) => set("arhivate", e.target.value || null)}>
-          <option value="">Active</option>
-          <option value="da">Arhivate</option>
-        </Select>
-      </div>
-      </div>
-
-      <div className="flex flex-wrap items-center gap-2">
+        {anyFilter && <span aria-hidden className="mx-1 h-6 w-px bg-navy-600" />}
         {anyFilter && (
           <Button size="sm" variant="ghost" onClick={() => { setQ(""); push(new URLSearchParams()); }}>
             <X size={13} />Șterge filtrele
@@ -169,7 +278,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
                 if (r.ok) { setSaving(false); setViewName(""); router.refresh(); }
               }}
             >
-              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-8 w-48" />
+              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-10 w-56" />
               <Button size="sm" type="submit" variant="primary">Salvează</Button>
               <Button size="sm" variant="ghost" onClick={() => setSaving(false)}>Renunță</Button>
             </form>
@@ -179,6 +288,24 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
         )}
         {msg && <span className="text-xs text-ink-muted" role="status">{msg}</span>}
       </div>
+      {views.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Vederi salvate">
+          <span className="w-full text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
+          {views.map((v) => (
+            <span key={v.id} className="inline-flex items-center">
+              <Chip pressed={currentQuery === v.query} onClick={() => { setQ(new URLSearchParams(v.query).get("q") ?? ""); push(new URLSearchParams(v.query)); }}>
+                <Bookmark size={11} className="mr-1 inline" aria-hidden />{v.name}
+              </Chip>
+              {v.mine && (
+                <button type="button" aria-label={`Șterge vederea ${v.name}`} className="ml-0.5 rounded p-0.5 text-ink-muted hover:text-ink"
+                  onClick={async () => { await deleteView(v.id); router.refresh(); }}>
+                  <X size={12} />
+                </button>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

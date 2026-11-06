@@ -1,0 +1,81 @@
+name: Program Windows (.exe)
+
+on:
+  push:
+    branches: [main, desktop-windows]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-windows-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalare dependențe
+        run: npm ci
+
+      - name: Teste
+        run: npm test
+
+      # Lead-urile importate automat la pornire nu stau în repo: vin din secretul LEADURI_ALTE_CATEGORII
+      # (CSV gzip în base64, făcut cu scripts/pack-leads.ts). Fără secret, programul se construiește fără ele.
+      - name: Adaugă lead-urile pentru importul automat
+        shell: bash
+        env:
+          LEADURI_ALTE_CATEGORII: ${{ secrets.LEADURI_ALTE_CATEGORII }}
+        run: |
+          set -euo pipefail
+          if [ -z "${LEADURI_ALTE_CATEGORII:-}" ]; then
+            echo "::warning::Secretul LEADURI_ALTE_CATEGORII lipsește: programul nu va importa automat lead-urile."
+            exit 0
+          fi
+          printf '%s' "$LEADURI_ALTE_CATEGORII" | base64 -d | gunzip > data/import/leaduri_litoral_alte_categorii.csv
+          echo "Lead-uri pentru import: $(($(wc -l < data/import/leaduri_litoral_alte_categorii.csv) - 1)) rânduri"
+
+      - name: Construiește installer-ul
+        run: npm run desktop:dist
+
+      # Publică installer-ul + latest.yml în GitHub Releases, ca „v<version din package.json>”.
+      # Programul instalat își ia de acolo singur actualizările. O versiune nouă cere creșterea
+      # „version” în package.json; la același număr, fișierele Release-ului sunt înlocuite.
+      - name: Publică versiunea în Releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          cd dist-desktop/installer
+          ls -la
+          test -f latest.yml
+          FILES=(latest.yml "twopixeldev-CRM-Setup-${VERSION}.exe" "twopixeldev-CRM-Setup-${VERSION}.exe.blockmap")
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            gh release upload "v${VERSION}" "${FILES[@]}" --clobber
+          else
+            gh release create "v${VERSION}" "${FILES[@]}" --target "${GITHUB_SHA}" --title "twopixeldev CRM ${VERSION}" --notes "Installer pentru Windows: twopixeldev-CRM-Setup-${VERSION}.exe"
+          fi
+
+      - name: Salvează installer-ul
+        uses: actions/upload-artifact@v4
+        with:
+          name: twopixeldev-CRM-Windows
+          path: dist-desktop/installer/*.exe
+          if-no-files-found: error
+          retention-days: 30

@@ -1,8 +1,9 @@
 import "server-only";
-import type { PipelineStage, Prisma, Priority, PropertyType, WebsiteStatus, Zone } from "@prisma/client";
+import { cache } from "react";
+import type { LeadCategory, PipelineStage, Prisma, Priority, PropertyType, WebsiteStatus, Zone } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { PRIORITIES, STAGES, TYPES, WEBSITE_STATUSES, ZONES } from "@/lib/labels";
+import { CATEGORIES, PRIORITIES, STAGES, TYPES, WEBSITE_STATUSES, ZONES } from "@/lib/labels";
 import { searchTerms } from "@/lib/normalize";
 
 export const PAGE_SIZE = 50;
@@ -13,11 +14,12 @@ const multi = <T extends string>(values: readonly T[]) =>
     .optional()
     .transform((v) => (v === undefined ? [] : (Array.isArray(v) ? v : v.split(",")).filter((x): x is T => (values as readonly string[]).includes(x))));
 
-export const SORTS = ["prioritate", "nume", "zona", "etapa", "ultima", "camere", "adaugat"] as const;
+export const SORTS = ["prioritate", "nume", "categorie", "zona", "etapa", "ultima", "camere", "adaugat"] as const;
 
-/** Filtrele din URL (?zona=MAMAIA,EFORIE_NORD&prioritate=A&q=...). */
+/** Filtrele din URL (?categorie=HOTELURI&zona=MAMAIA,EFORIE_NORD&prioritate=A&q=...). Fără `categorie` = toate categoriile. */
 export const leadFiltersSchema = z.object({
   q: z.string().optional().default(""),
+  categorie: multi<LeadCategory>(CATEGORIES),
   zona: multi<Zone>(ZONES),
   tip: multi<PropertyType>(TYPES),
   prioritate: multi<Priority>(PRIORITIES),
@@ -43,6 +45,7 @@ export function buildLeadWhere(f: LeadFilters, currentUserId: string): Prisma.Le
   const and: Prisma.LeadWhereInput[] = [];
   and.push(f.arhivate === "da" ? { archivedAt: { not: null } } : { archivedAt: null });
   for (const term of searchTerms(f.q)) and.push({ searchText: { contains: term } });
+  if (f.categorie.length) and.push({ category: { in: f.categorie } });
   if (f.zona.length) and.push({ zone: { in: f.zona } });
   if (f.tip.length) and.push({ type: { in: f.tip } });
   if (f.prioritate.length) and.push({ priority: { in: f.prioritate } });
@@ -67,6 +70,7 @@ function buildOrder(f: LeadFilters): Prisma.LeadOrderByWithRelationInput[] {
   const d = f.dir;
   switch (f.sort) {
     case "nume": return [{ nameNormalized: d }];
+    case "categorie": return [{ category: d }, { priority: "asc" }, { nameNormalized: "asc" }];
     case "zona": return [{ zone: d }, { nameNormalized: "asc" }];
     case "etapa": return [{ stage: d }, { nameNormalized: "asc" }];
     case "ultima": return [{ lastInteractionAt: { sort: d, nulls: "last" } }, { nameNormalized: "asc" }];
@@ -86,7 +90,7 @@ export async function listLeads(f: LeadFilters, currentUserId: string) {
       skip: (f.pagina - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       select: {
-        id: true, name: true, type: true, zone: true, address: true, phone: true, email: true,
+        id: true, name: true, category: true, type: true, businessType: true, zone: true, address: true, phone: true, email: true,
         priority: true, stage: true, websiteStatus: true, roomsCount: true, starsOsm: true,
         lastInteractionAt: true, doNotContact: true, archivedAt: true,
         owner: { select: { id: true, name: true, email: true } },
@@ -96,7 +100,8 @@ export async function listLeads(f: LeadFilters, currentUserId: string) {
   return { total, rows, pages: Math.max(1, Math.ceil(total / PAGE_SIZE)) };
 }
 
-export async function getLeadDetail(id: string) {
+/** Cu cache pe cerere: titlul paginii (generateMetadata) și pagina folosesc aceeași interogare. */
+export const getLeadDetail = cache(async (id: string) => {
   return prisma.lead.findUnique({
     where: { id },
     include: {
@@ -112,7 +117,7 @@ export async function getLeadDetail(id: string) {
       },
     },
   });
-}
+});
 
 export async function getLeadAudit(id: string) {
   return prisma.auditLog.findMany({

@@ -72,8 +72,8 @@ export function ContactsSection({ leadId, contacts, canEdit, blocked }: { leadId
           <div key={c.id} className="flex flex-col gap-2 rounded-lg border border-navy-600 p-3">
             <div className="flex flex-wrap items-center gap-2">
               <b>{c.name}</b>
-              <span className="rounded-full border border-navy-600 px-2 py-0.5 text-[11px] text-ink-muted">{CONTACT_ROLE_LABEL[c.role]}</span>
-              {c.isPrimary && <span className="text-[11px] text-gold">principal</span>}
+              <span className="rounded-full border border-navy-600 px-2 py-0.5 text-[15px] text-ink-muted">{CONTACT_ROLE_LABEL[c.role]}</span>
+              {c.isPrimary && <span className="text-[15px] text-gold">principal</span>}
               {canEdit && (
                 <span className="ml-auto flex gap-1">
                   <button type="button" aria-label={`Editează ${c.name}`} className="rounded p-1 text-ink-muted hover:text-ink" onClick={() => setEditing(c.id)}><Pencil size={14} /></button>

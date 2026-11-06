@@ -5,3 +5,12 @@ node_modules
 *.tsbuildinfo
 next-env.d.ts
 coverage
+dist-desktop
+desktop/app/main.js
+desktop/app/preload.js
+desktop/app/package.json
+
+# Lead-urile importate automat nu stau în repo (care e public): workflow-ul le scrie aici din secretul
+# LEADURI_ALTE_CATEGORII, doar pe durata build-ului. Vezi scripts/pack-leads.ts.
+data/import/*
+!data/import/.gitkeep

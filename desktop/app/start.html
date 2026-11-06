@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>twopixeldev CRM</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main style="max-width:520px;margin-top:12vh">
+    <img class="logo" src="logo.png" alt="twopixeldev" />
+    <div id="spinner" class="spinner"></div>
+    <p id="status" class="center" style="color:var(--muted)">Pornesc…</p>
+    <div id="error" class="hidden">
+      <div id="errorText" class="msg err"></div>
+      <p class="hint">Verifică dacă ești conectat la internet. Dacă problema continuă, verifică adresa bazei de date.</p>
+      <div class="actions" style="justify-content:center">
+        <button id="logs" type="button" class="secondary">Jurnale</button>
+        <button id="setup" type="button" class="secondary">Schimbă conexiunea</button>
+        <button id="retry" type="button">Încearcă din nou</button>
+      </div>
+    </div>
+  </main>
+  <script src="start.js"></script>
+</body>
+</html>

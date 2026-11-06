@@ -4,10 +4,11 @@ import { notFound } from "next/navigation";
 import { ExternalLink, Mail, MapPin, MessageCircle, Pencil, Phone } from "lucide-react";
 import { ArchiveButton, ClaimButton, OptOutControl } from "@/components/leads/lead-actions";
 import { ContactsSection } from "@/components/leads/contacts-section";
+import { LeadTabTitle } from "@/components/leads/lead-tabs";
 import { PriorityBadge, StageBadge, WebsiteBadge } from "@/components/ui/badges";
 import { buttonClass } from "@/components/ui/button";
 import { Panel } from "@/components/ui/page-header";
-import { AUDIT_LABEL, IMPORT_ACTION_LABEL, LEAD_FIELD_LABEL, SOURCE_LABEL, TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
+import { AUDIT_LABEL, CATEGORY_SINGULAR, IMPORT_ACTION_LABEL, LEAD_FIELD_LABEL, SOURCE_LABEL, TYPE_LABEL, ZONE_LABEL } from "@/lib/labels";
 import { mailLink, mapsLink, telLink, whatsappLink } from "@/lib/links";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { canArchive, canEditLead } from "@/server/permissions";
@@ -32,8 +33,7 @@ const fmtValue = (v: unknown) => (v === null || v === undefined || v === "" ? "�
 
 export default async function LeadPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const user = await requireUser();
-  const [lead, audit] = await Promise.all([getLeadDetail(id), getLeadAudit(id)]);
+  const [user, lead, audit] = await Promise.all([requireUser(), getLeadDetail(id), getLeadAudit(id)]);
   if (!lead) notFound();
   const canEdit = canEditLead(user, lead);
   const primary = lead.contacts.find((c) => c.isPrimary) ?? lead.contacts[0];
@@ -46,17 +46,21 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-4">
+      <LeadTabTitle id={lead.id} title={lead.name} />
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-ink-muted">
-          <Link href="/leaduri" className="hover:text-ink">Lead-uri</Link><span aria-hidden>/</span><span>{ZONE_LABEL[lead.zone]}</span>
-        </div>
         <div className="flex flex-wrap items-start gap-3">
           <div className="min-w-0 flex-1">
             <div className="mb-1 flex flex-wrap items-center gap-2 text-xs text-ink-muted">
               <PriorityBadge p={lead.priority} />
-              <span>{TYPE_LABEL[lead.type]}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}</span>
+              <span>
+                {CATEGORY_SINGULAR[lead.category]}
+                {lead.category !== "HOTELURI" && lead.businessType ? ` · ${lead.businessType}` : ""}
+                {lead.category === "HOTELURI" && <>
+                  {` · ${TYPE_LABEL[lead.type]}`}{lead.categoryMinistry ? ` · ${lead.categoryMinistry}` : ""}{lead.starsOsm ? ` · ${lead.starsOsm}★ OSM` : ""}{lead.roomsCount ? ` · ${lead.roomsCount} camere` : ""}
+                </>}
+              </span>
             </div>
-            <h1 className="font-display text-2xl font-extrabold tracking-tight text-balance">{lead.name}</h1>
+            <h2 className="font-display text-2xl font-extrabold tracking-tight text-balance">{lead.name}</h2>
             <p className="text-sm text-ink-muted">{[lead.address, ZONE_LABEL[lead.zone]].filter(Boolean).join(", ")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -96,7 +100,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
           <h2 className="mb-3 font-display text-base font-bold">Detalii</h2>
           {lead.manualCheckNote && (
             <div className="mb-3 rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-warn">Verificare manuală</span>
+              <span className="text-[15px] font-semibold uppercase tracking-[0.06em] text-warn">Verificare manuală</span>
               <div>{lead.manualCheckNote}</div>
             </div>
           )}

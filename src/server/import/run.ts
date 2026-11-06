@@ -12,7 +12,7 @@ const CHUNK = 200;
 /** Pasul 1: citește fișierul și salvează rândurile brute. Nu atinge lead-urile. */
 export async function createImportBatch(
   db: PrismaClient,
-  args: { fileName: string; buffer: ArrayBuffer; userId: string | null; sheetName?: string | null },
+  args: { fileName: string; buffer: ArrayBuffer; userId: string | null; sheetName?: string | null; id?: string },
 ) {
   const parsed = await parseImportFile(args.fileName, args.buffer, args.sheetName);
   if (!parsed.headers.length || !parsed.rows.length) {
@@ -21,6 +21,7 @@ export async function createImportBatch(
   const columnMap = autoDetectColumnMap(parsed.headers);
   const batch = await db.importBatch.create({
     data: {
+      ...(args.id ? { id: args.id } : {}),
       fileName: args.fileName,
       sheetName: parsed.sheetName,
       status: "PREVIZUALIZARE",
@@ -49,7 +50,7 @@ export function readMapping(json: Prisma.JsonValue): BatchMapping {
 
 /** Toate lead-urile (și cele arhivate, ca să nu fie re-create), cu valorile câmpurilor completabile. */
 export async function loadExistingLeads(db: PrismaClient | Prisma.TransactionClient): Promise<ExistingLead[]> {
-  const select = Object.fromEntries([...FILLABLE_KEYS, "id", "nameNormalized", "zone"].map((k) => [k, true])) as Prisma.LeadSelect;
+  const select = Object.fromEntries([...FILLABLE_KEYS, "id", "category", "nameNormalized", "zone"].map((k) => [k, true])) as Prisma.LeadSelect;
   const leads = (await db.lead.findMany({ select })) as unknown as Array<Record<string, unknown>>;
   return leads.map((l) => {
     const values: Partial<Record<FillableKey, unknown>> = {};
@@ -60,6 +61,7 @@ export async function loadExistingLeads(db: PrismaClient | Prisma.TransactionCli
     return {
       id: l.id as string,
       osmId: (l.osmId as string | null) ?? null,
+      category: l.category as ExistingLead["category"],
       nameNormalized: l.nameNormalized as string,
       zone: l.zone as ExistingLead["zone"],
       phoneNormalized: (l.phoneNormalized as string | null) ?? null,
@@ -97,7 +99,9 @@ function toCreateInput(
     name: d.name,
     nameNormalized: d.nameNormalized,
     zone: d.zone,
+    category: d.category,
     type: d.type ?? "ALTUL",
+    businessType: d.businessType ?? null,
     address: d.address ?? null,
     latitude: d.latitude ?? null,
     longitude: d.longitude ?? null,
