@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   // Pachete folosite (indirect) de exceljs pe care trasarea Next nu le copiază complet:
   // Node 22+ încarcă varianta „module-sync” (require.mjs), pe care trasarea nu o urmărește.
   outputFileTracingIncludes: {
-    "/**": ["./node_modules/generator-function/**/*", "./node_modules/async-function/**/*"],
+    "/**": ["./node_modules/generator-function/**/*", "./node_modules/async-function/**/*", "./data/import/**/*"],
   },
 };
 
