@@ -1,23 +1,31 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { loginAction } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 
-export function LoginForm({ redirectTo }: { redirectTo: string }) {
+export function LoginForm({ redirectTo, savedEmail }: { redirectTo: string; savedEmail?: string }) {
   const [state, action, pending] = useActionState(loginAction, null);
   const [showPassword, setShowPassword] = useState(false);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  // emailul e precompletat: mergem direct la parolă
+  useEffect(() => {
+    if (!state && savedEmail) passwordRef.current?.focus();
+  }, [state, savedEmail]);
+
   return (
     <form action={action} className="mt-4 flex flex-col gap-3">
       <input type="hidden" name="redirectTo" value={redirectTo} />
       <Field label="Email" htmlFor="email">
-        <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={state?.email ?? ""} key={state?.email ?? ""} />
+        <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={state?.email ?? savedEmail ?? ""} key={state?.email ?? ""} />
       </Field>
       <Field label="Parolă" htmlFor="password">
         <div className="relative">
           <Input
+            ref={passwordRef}
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}

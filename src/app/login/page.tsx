@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import { cookies } from "next/headers";
+import { LAST_EMAIL_COOKIE } from "@/lib/remember";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Autentificare" };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ callbackUrl?: string; dezactivat?: string }> }) {
-  const { callbackUrl, dezactivat } = await searchParams;
+  const [{ callbackUrl, dezactivat }, jar] = await Promise.all([searchParams, cookies()]);
+  const savedEmail = jar.get(LAST_EMAIL_COOKIE)?.value;
   const redirectTo = safeRedirect(callbackUrl);
   return (
     <main className="grid min-h-dvh place-items-center px-4 py-10">
@@ -19,7 +22,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
               Contul tău a fost dezactivat sau șters. Cere-i unui administrator să-l reactiveze.
             </p>
           )}
-          <LoginForm redirectTo={redirectTo} />
+          <LoginForm redirectTo={redirectTo} savedEmail={savedEmail} />
         </div>
       </div>
     </main>

@@ -4,7 +4,7 @@ import { randomUUID } from "node:crypto";
 import { cookies } from "next/headers";
 import { AuthError } from "next-auth";
 import { signIn, signOut } from "@/auth";
-import { TEMP_SESSION_COOKIE } from "@/lib/remember";
+import { LAST_EMAIL_COOKIE, TEMP_SESSION_COOKIE } from "@/lib/remember";
 
 export type LoginState = { error: string; email: string; remember: boolean } | null;
 
@@ -29,8 +29,12 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
     if (sid) {
       // fără maxAge / expires: dispare când se închide programul (sau browserul)
       jar.set(TEMP_SESSION_COOKIE, sid, { httpOnly: true, sameSite: "lax", path: "/" });
+      jar.delete(LAST_EMAIL_COOKIE);
     } else {
       jar.delete(TEMP_SESSION_COOKIE);
+      // localStorage nu ajută aici: în program portul se schimbă la fiecare pornire, cookie-urile nu țin de port
+      const email = String(formData.get("email") ?? "").trim().toLowerCase();
+      if (email) jar.set(LAST_EMAIL_COOKIE, email, { httpOnly: true, sameSite: "lax", path: "/", maxAge: 365 * 24 * 60 * 60 });
     }
     throw err;
   }
