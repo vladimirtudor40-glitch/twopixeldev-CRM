@@ -73,7 +73,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
 
   const Group = ({ label, k, options }: { label: string; k: string; options: [string, string][] }) => (
     <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={label}>
-      <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">{label}</span>
+      <span className="w-full text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">{label}</span>
       {options.map(([v, l]) => <Chip key={v} pressed={has(k, v)} onClick={() => toggle(k, v)}>{l}</Chip>)}
     </div>
   );
@@ -94,7 +94,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
 
       {views.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Vederi salvate">
-          <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
+          <span className="w-full text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Vederi</span>
           {views.map((v) => (
             <span key={v.id} className="inline-flex items-center">
               <Chip pressed={currentQuery === v.query} onClick={() => { setQ(new URLSearchParams(v.query).get("q") ?? ""); push(new URLSearchParams(v.query)); }}>
@@ -122,7 +122,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
       <Group label="Tip" k="tip" options={TYPES.map((t) => [t, TYPE_LABEL[t]])} />
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="w-full text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Altele</span>
+        <span className="w-full text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted sm:w-24 sm:shrink-0">Altele</span>
         <Select aria-label="Telefon" className="w-auto" value={sp.get("telefon") ?? ""} onChange={(e) => set("telefon", e.target.value || null)}>
           <option value="">Telefon: oricare</option>
           <option value="da">Are telefon</option>
@@ -169,7 +169,7 @@ export function LeadFilters({ views, users }: { views: View[]; users: { id: stri
                 if (r.ok) { setSaving(false); setViewName(""); router.refresh(); }
               }}
             >
-              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-8 w-48" />
+              <Input id="view-name" autoFocus value={viewName} onChange={(e) => setViewName(e.target.value)} placeholder="Numele vederii" className="h-10 w-56" />
               <Button size="sm" type="submit" variant="primary">Salvează</Button>
               <Button size="sm" variant="ghost" onClick={() => setSaving(false)}>Renunță</Button>
             </form>

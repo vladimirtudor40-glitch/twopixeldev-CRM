@@ -61,7 +61,7 @@ export default async function DashboardPage() {
               { label: "Ale mele", value: mine, sub: optOut ? `${optOut} cu „Nu mai contacta”` : "lead-uri cu tine responsabil", href: "/leaduri?responsabil=eu" },
             ].map((k) => (
               <Link key={k.label} href={k.href} className="rounded-xl border border-navy-600 bg-navy-800 px-4 py-3 hover:border-teal">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-muted">{k.label}</div>
+                <div className="text-[15px] font-semibold uppercase tracking-[0.06em] text-ink-muted">{k.label}</div>
                 <div className="mt-1 font-display text-3xl font-extrabold tabular">{formatNumber(Math.max(0, k.value))}</div>
                 <div className="text-xs text-ink-muted">{k.sub}</div>
               </Link>

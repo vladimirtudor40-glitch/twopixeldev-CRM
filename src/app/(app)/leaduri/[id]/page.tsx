@@ -96,7 +96,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
           <h2 className="mb-3 font-display text-base font-bold">Detalii</h2>
           {lead.manualCheckNote && (
             <div className="mb-3 rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-warn">Verificare manuală</span>
+              <span className="text-[15px] font-semibold uppercase tracking-[0.06em] text-warn">Verificare manuală</span>
               <div>{lead.manualCheckNote}</div>
             </div>
           )}

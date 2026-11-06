@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
     <main className="grid min-h-dvh place-items-center px-4 py-10">
       <div className="w-full max-w-sm">
         <Image src="/brand/twopixeldev-logo.png" alt="twopixeldev" width={240} height={34} priority className="mx-auto h-auto w-56" />
-        <p className="mt-2 text-center text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">CRM vânzări</p>
+        <p className="mt-2 text-center text-[15px] font-semibold uppercase tracking-[0.18em] text-gold">CRM vânzări</p>
         <div className="mt-8 rounded-xl border border-navy-600 bg-navy-800 p-6">
           <h1 className="font-display text-lg font-bold">Intră în cont</h1>
           {dezactivat && (
