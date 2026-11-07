@@ -11,7 +11,7 @@ export default function Loading() {
       </div>
       <Skeleton className="mb-2 h-4 w-32" />
       <div className="overflow-hidden rounded-xl border border-navy-600 bg-navy-800">
-        <div className="h-10 bg-[#0D1F33]" />
+        <div className="h-10 bg-navy-850" />
         {Array.from({ length: 12 }, (_, i) => (
           <div key={i} className="flex items-center gap-4 border-t border-navy-600 px-3 py-3">
             <Skeleton className="h-5 w-7" />

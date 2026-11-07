@@ -47,7 +47,7 @@ function ContactForm({ leadId, contact, onDone }: { leadId: string; contact?: C;
         <Field label="Notițe" htmlFor={`c-${id}-notes`} className="sm:col-span-2"><Textarea {...reg("notes")} rows={2} /></Field>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" {...register("isPrimary")} className="h-4 w-4 accent-teal" />Contact principal</label>
-      {error && <p role="alert" className="text-sm text-[#F2A49D]">{error}</p>}
+      {error && <p role="alert" className="text-sm text-danger-hi">{error}</p>}
       <div className="flex gap-2">
         <Button type="submit" size="sm" variant="primary" disabled={isSubmitting}>{isSubmitting ? "Se salvează…" : "Salvează"}</Button>
         <Button size="sm" variant="ghost" onClick={onDone}>Renunță</Button>
@@ -83,7 +83,7 @@ export function ContactsSection({ leadId, contacts, canEdit, blocked }: { leadId
                       <Button size="sm" variant="ghost" onClick={() => setConfirmDelete(null)}>Nu</Button>
                     </>
                   ) : (
-                    <button type="button" aria-label={`Șterge ${c.name}`} className="rounded p-1 text-ink-muted hover:text-[#F2A49D]" onClick={() => setConfirmDelete(c.id)}><Trash2 size={14} /></button>
+                    <button type="button" aria-label={`Șterge ${c.name}`} className="rounded p-1 text-ink-muted hover:text-danger-hi" onClick={() => setConfirmDelete(c.id)}><Trash2 size={14} /></button>
                   )}
                 </span>
               )}

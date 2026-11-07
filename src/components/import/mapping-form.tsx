@@ -52,7 +52,7 @@ export function MappingForm({ batchId, headers, map, targets, samples }: {
           if (r.ok) router.refresh();
         })}>{pending ? "Se recalculează…" : "Salvează maparea"}</Button>
         {dirty && <Button size="sm" variant="ghost" onClick={() => setValue(map)}>Renunță la modificări</Button>}
-        {msg && <span role="status" className={msg.ok ? "text-xs text-ink-muted" : "text-xs text-[#F2A49D]"}>{msg.text}</span>}
+        {msg && <span role="status" className={msg.ok ? "text-xs text-ink-muted" : "text-xs text-danger-hi"}>{msg.text}</span>}
       </div>
     </div>
   );

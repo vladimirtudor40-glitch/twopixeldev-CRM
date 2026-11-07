@@ -49,7 +49,7 @@ export function LoginForm({ redirectTo }: { redirectTo: string }) {
         />
         Ține-mă minte
       </label>
-      {state?.error && <p className="text-sm text-[#F2A49D]" role="alert">{state.error}</p>}
+      {state?.error && <p className="text-sm text-danger-hi" role="alert">{state.error}</p>}
       <Button type="submit" variant="primary" disabled={pending} className="mt-1">
         {pending ? "Se verifică…" : "Intră"}
       </Button>

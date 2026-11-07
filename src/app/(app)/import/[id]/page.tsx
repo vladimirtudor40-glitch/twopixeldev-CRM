@@ -17,10 +17,10 @@ export const metadata: Metadata = { title: "Import" };
 
 const ACTION_STYLE: Record<ImportRowAction, string> = {
   CREAT: "bg-gold/20 text-gold-hi",
-  ACTUALIZAT: "bg-teal/20 text-[#7FD8D4]",
+  ACTUALIZAT: "bg-teal/20 text-teal-soft",
   NESCHIMBAT: "bg-navy-700 text-ink-muted",
   IGNORAT: "bg-navy-700 text-ink-muted line-through",
-  EROARE: "bg-danger/15 text-[#F2A49D]",
+  EROARE: "bg-danger/15 text-danger-hi",
 };
 const FILTERS: { key: string; label: string; actions: ImportRowAction[] }[] = [
   { key: "toate", label: "Toate", actions: ["CREAT", "ACTUALIZAT", "NESCHIMBAT", "IGNORAT", "EROARE"] },
@@ -70,9 +70,9 @@ export default async function ImportBatchPage({ params, searchParams }: {
 
   const tiles = [
     { label: "Lead-uri noi", value: summary.create, cls: "text-gold-hi" },
-    { label: "Completează câmpuri goale", value: summary.update, cls: "text-[#7FD8D4]" },
+    { label: "Completează câmpuri goale", value: summary.update, cls: "text-teal-soft" },
     { label: "Deja în CRM, nimic nou", value: summary.unchanged, cls: "" },
-    { label: "Erori / excluse", value: summary.error + summary.skipped, cls: summary.error ? "text-[#F2A49D]" : "" },
+    { label: "Erori / excluse", value: summary.error + summary.skipped, cls: summary.error ? "text-danger-hi" : "" },
   ];
 
   return (

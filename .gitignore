@@ -14,3 +14,8 @@ desktop/app/package.json
 # LEADURI_ALTE_CATEGORII, doar pe durata build-ului. Vezi scripts/pack-leads.ts.
 data/import/*
 !data/import/.gitkeep
+
+# Versiunea web (Cloudflare): build-ul OpenNext și fișierele locale Wrangler
+.open-next
+.wrangler
+.dev.vars

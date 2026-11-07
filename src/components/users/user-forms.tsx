@@ -22,7 +22,7 @@ const fieldError = (state: ActionResult | null, key: string) =>
 function Feedback({ state }: { state: ActionResult | null }) {
   if (!state) return null;
   if (state.ok) return <p role="status" className="text-sm text-ok">{state.message}</p>;
-  return <p role="alert" className="text-sm text-[#F2A49D]">{state.error}</p>;
+  return <p role="alert" className="text-sm text-danger-hi">{state.error}</p>;
 }
 
 function RoleSelect({ id, defaultValue, disabled }: { id: string; defaultValue: string; disabled?: boolean }) {
