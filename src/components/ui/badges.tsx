@@ -8,7 +8,7 @@ export function PriorityBadge({ p }: { p: Priority }) {
       title={`Prioritate ${p}`}
       className={cn(
         "inline-grid h-6 w-6 shrink-0 place-items-center rounded-md font-display text-xs font-extrabold",
-        p === "A" && "bg-gold text-navy",
+        p === "A" && "bg-gold text-on-gold",
         p === "B" && "bg-gold/20 text-gold-hi",
         p === "C" && "bg-navy-700 text-ink-muted",
       )}
@@ -32,7 +32,7 @@ export function WebsiteBadge({ w }: { w: WebsiteStatus }) {
     <span
       className={cn(
         "whitespace-nowrap rounded px-1.5 py-0.5 text-[15px]",
-        (w === "FARA_SITE" || w === "DOAR_PLATFORME") && "bg-ok/15 text-[#7FD8B4]",
+        (w === "FARA_SITE" || w === "DOAR_PLATFORME") && "bg-ok/15 text-ok-hi",
         w === "ARE_SITE_PROPRIU" && "bg-navy-700 text-ink-muted",
         w === "NECUNOSCUT" && "bg-warn/15 text-warn",
       )}
@@ -43,5 +43,5 @@ export function WebsiteBadge({ w }: { w: WebsiteStatus }) {
 }
 
 export function OptOutBadge() {
-  return <span className="whitespace-nowrap rounded bg-danger/15 px-1.5 py-0.5 text-[15px] text-[#F2A49D]">Nu mai contacta</span>;
+  return <span className="whitespace-nowrap rounded bg-danger/15 px-1.5 py-0.5 text-[15px] text-danger-hi">Nu mai contacta</span>;
 }

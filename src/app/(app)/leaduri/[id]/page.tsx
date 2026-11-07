@@ -73,7 +73,7 @@ export default async function LeadPage({ params }: { params: Promise<{ id: strin
         {lead.archivedAt && <div className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-sm text-warn">Lead arhivat pe {formatDate(lead.archivedAt)}. Nu apare în liste.</div>}
 
         {blocked ? (
-          <div className="rounded-lg border border-danger/50 bg-danger/10 px-3 py-2.5 text-sm text-[#F2A49D]">
+          <div className="rounded-lg border border-danger/50 bg-danger/10 px-3 py-2.5 text-sm text-danger-hi">
             <b>Nu mai contacta.</b> Marcat de {lead.doNotContactBy?.name || lead.doNotContactBy?.email || "un utilizator"} pe {formatDate(lead.doNotContactAt)}
             {lead.doNotContactReason ? ` · ${lead.doNotContactReason}` : ""}. Butoanele de contact sunt dezactivate și lead-ul nu intră în campanii.
           </div>

@@ -43,7 +43,7 @@ export function RunControls({ batchId, summary, owners, defaultOwnerId }: {
           <Button variant="ghost" size="sm" onClick={() => setConfirmCancel(true)}>Anulează</Button>
         )}
       </div>
-      {result && <p role="status" className={result.ok ? "text-sm text-[#7FD8B4]" : "text-sm text-[#F2A49D]"}>{result.text}</p>}
+      {result && <p role="status" className={result.ok ? "text-sm text-ok-hi" : "text-sm text-danger-hi"}>{result.text}</p>}
     </div>
   );
 }

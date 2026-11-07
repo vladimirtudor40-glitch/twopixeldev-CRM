@@ -15,7 +15,7 @@ export function UploadForm() {
         <span className="text-xs text-ink-muted">leaduri_litoral.xlsx (foaia „Leaduri”) sau .csv · maxim 8 MB</span>
         <input id="file" name="file" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required className="mt-2 max-w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-navy-700 file:px-3 file:py-1.5 file:text-ink" />
       </label>
-      {state && !state.ok && <p role="alert" className="text-sm text-[#F2A49D]">{state.error}</p>}
+      {state && !state.ok && <p role="alert" className="text-sm text-danger-hi">{state.error}</p>}
       <Button type="submit" variant="primary" disabled={pending} className="self-start">{pending ? "Se citește fișierul…" : "Încarcă și previzualizează"}</Button>
       <p className="text-xs text-ink-muted">Nimic nu se scrie în baza de date până nu apeși „Importă” pe pagina următoare.</p>
     </form>

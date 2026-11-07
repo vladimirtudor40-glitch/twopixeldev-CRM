@@ -8,7 +8,8 @@ import { prisma } from "@/lib/prisma";
 import { formatDateTime, formatNumber } from "@/lib/utils";
 import { requireUser, sessionUserId } from "@/server/session";
 
-const PRIO_COLOR = { A: "#BFA181", B: "#8C7A5E", C: "#3A5470" } as const;
+// culorile vin din tema (globals.css), ca să urmeze și paleta site-ului în versiunea web
+const PRIO_COLOR = { A: "rgb(var(--c-gold))", B: "rgb(var(--c-prio-b))", C: "rgb(var(--c-prio-c))" } as const;
 
 type CountRow = {
   zone: Zone; priority: Priority; stage: PipelineStage;

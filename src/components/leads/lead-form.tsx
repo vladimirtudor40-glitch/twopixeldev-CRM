@@ -114,7 +114,7 @@ export function LeadForm({ leadId, defaults, users, canChangeOwner }: Props) {
       </Panel>
 
       {serverError && (
-        <div role="alert" className="rounded-lg border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-[#F2A49D]">
+        <div role="alert" className="rounded-lg border border-danger/50 bg-danger/10 px-3 py-2 text-sm text-danger-hi">
           {serverError}{" "}
           {duplicate && (
             <>

@@ -1,18 +1,29 @@
 import type { Config } from "tailwindcss";
 
-// Paleta twopixeldev: albastru închis clasic, turcoaz, auriu.
+// Culorile vin din variabile CSS (src/app/globals.css): implicit paleta CRM-ului (albastru închis,
+// turcoaz, auriu); în versiunea web, inclusă în site la /app/ → Clienți, paleta site-ului (data-skin="site").
+const v = (name: string) => `rgb(var(--c-${name}) / <alpha-value>)`;
+
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        navy: { DEFAULT: "#0A1828", 900: "#07121F", 800: "#0F2236", 700: "#14304A", 600: "#1F3B57" },
-        teal: { DEFAULT: "#178582", hi: "#25A7A2" },
-        gold: { DEFAULT: "#BFA181", hi: "#D7BE98" },
-        ink: { DEFAULT: "#E8EEF3", muted: "#8EA2B6" },
-        danger: "#D5675E",
-        warn: "#D9A441",
-        ok: "#43B48C",
+        navy: { DEFAULT: v("navy"), 900: v("navy-900"), 850: v("navy-850"), 800: v("navy-800"), 700: v("navy-700"), 600: v("navy-600") },
+        teal: { DEFAULT: v("teal"), hi: v("teal-hi"), soft: v("teal-soft") },
+        gold: { DEFAULT: v("gold"), hi: v("gold-hi") },
+        ink: { DEFAULT: v("ink"), muted: v("ink-muted") },
+        // textul de pe butoanele / insignele colorate (bg-teal, bg-gold)
+        "on-teal": v("on-teal"),
+        "on-gold": v("on-gold"),
+        danger: { DEFAULT: v("danger"), hi: v("danger-hi") },
+        warn: v("warn"),
+        ok: { DEFAULT: v("ok"), hi: v("ok-hi") },
+      },
+      borderRadius: {
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
       },
       // Mărimile de text sunt cu 4 px peste cele standard Tailwind (cerința lui Vladimir, 2026-11-06)
       fontSize: {
@@ -25,8 +36,8 @@ const config: Config = {
         "3xl": ["34px", { lineHeight: "40px" }],
       },
       fontFamily: {
-        display: ["Archivo", "Segoe UI", "system-ui", "sans-serif"],
-        sans: ["Instrument Sans", "Segoe UI", "system-ui", "-apple-system", "sans-serif"],
+        display: ["var(--font-display)", "Segoe UI", "system-ui", "sans-serif"],
+        sans: ["var(--font-body)", "Segoe UI", "system-ui", "-apple-system", "sans-serif"],
       },
     },
   },
