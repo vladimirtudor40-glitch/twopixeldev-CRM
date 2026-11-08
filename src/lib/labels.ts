@@ -67,17 +67,18 @@ export const STAGE_LABEL: Record<PipelineStage, string> = {
   REVINO_MAI_TARZIU: "Revino mai târziu",
 };
 
+// Culoarea implicită e a CRM-ului; tema site-ului (data-skin="site") o schimbă prin variabilele --st-*.
 export const STAGE_COLOR: Record<PipelineStage, string> = {
-  NOU: "#7F8FA6",
-  DE_VERIFICAT: "#9C8FD0",
-  CONTACTAT: "#2F8FB8",
-  INTERESAT: "#178582",
-  DEMO_PROGRAMAT: "#2DB3A9",
-  OFERTA_TRIMISA: "#C7AE86",
-  NEGOCIERE: "#D9A441",
-  CASTIGAT: "#E0C38F",
-  PIERDUT: "#D5675E",
-  REVINO_MAI_TARZIU: "#6E7F99",
+  NOU: "var(--st-nou, #7F8FA6)",
+  DE_VERIFICAT: "var(--st-de-verificat, #9C8FD0)",
+  CONTACTAT: "var(--st-contactat, #2F8FB8)",
+  INTERESAT: "var(--st-interesat, #178582)",
+  DEMO_PROGRAMAT: "var(--st-demo-programat, #2DB3A9)",
+  OFERTA_TRIMISA: "var(--st-oferta-trimisa, #C7AE86)",
+  NEGOCIERE: "var(--st-negociere, #D9A441)",
+  CASTIGAT: "var(--st-castigat, #E0C38F)",
+  PIERDUT: "var(--st-pierdut, #D5675E)",
+  REVINO_MAI_TARZIU: "var(--st-revino-mai-tarziu, #6E7F99)",
 };
 
 export const SOURCE_LABEL: Record<LeadSource, string> = {

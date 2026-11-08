@@ -14,3 +14,8 @@ desktop/app/package.json
 # LEADURI_ALTE_CATEGORII, doar pe durata build-ului. Vezi scripts/pack-leads.ts.
 data/import/*
 !data/import/.gitkeep
+
+
+# Versiunea web (Netlify): schema temporară din scripts/web.mjs și fișierele locale Netlify
+prisma/schema.web.prisma
+.netlify

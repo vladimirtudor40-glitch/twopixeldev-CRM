@@ -27,7 +27,7 @@ export function Field({ label, htmlFor, error, hint, children, className }: {
     <div className={cn("flex min-w-0 flex-col gap-1", className)}>
       <label htmlFor={htmlFor} className="text-xs font-medium text-ink-muted">{label}</label>
       {children}
-      {error ? <p className="text-xs text-[#F2A49D]" role="alert">{error}</p> : hint ? <p className="text-xs text-ink-muted">{hint}</p> : null}
+      {error ? <p className="text-xs text-danger-hi" role="alert">{error}</p> : hint ? <p className="text-xs text-ink-muted">{hint}</p> : null}
     </div>
   );
 }

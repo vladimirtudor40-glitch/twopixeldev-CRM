@@ -6,12 +6,14 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { ChevronDown, LayoutDashboard, Layers, List, Upload, Users } from "lucide-react";
 import { categoryHref, LEAD_CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
+import { WEB_MODE } from "@/lib/web";
 
 const ITEMS = [
   { href: "/", label: "Panou", icon: LayoutDashboard, exact: true },
   { href: "/leaduri", label: "Lead-uri", icon: List },
-  // Import nu apare în meniul lateral: pe desktop e în Fișier → Importă..., pe mobil în bara de jos.
-  { href: "/import", label: "Import", icon: Upload, adminOnly: true, sidebar: false },
+  // Import nu apare în meniul lateral al programului: acolo e în Fișier → Importă..., pe mobil în bara de jos.
+  // În site (versiunea web) nu există meniul Fișier, deci apare în meniul lateral.
+  { href: "/import", label: "Import", icon: Upload, adminOnly: true, sidebar: WEB_MODE },
   { href: "/utilizatori", label: "Utilizatori", icon: Users, adminOnly: true },
 ];
 
@@ -107,7 +109,7 @@ export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
   return (
     <nav
       aria-label="Navigare"
-      className="fixed inset-x-0 bottom-0 z-30 grid border-t border-navy-600 bg-[#0C1D30] pb-[env(safe-area-inset-bottom)] md:hidden"
+      className="fixed inset-x-0 bottom-0 z-30 grid border-t border-navy-600 bg-navy-900 pb-[env(safe-area-inset-bottom)] md:hidden"
       style={{ gridTemplateColumns: `repeat(${items.length}, minmax(0, 1fr))` }}
     >
       {items.map((i) => {

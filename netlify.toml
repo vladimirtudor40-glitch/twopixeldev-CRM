@@ -1,0 +1,11 @@
+# Versiunea web a CRM-ului, afișată în site la twopixeldev.com/app/ → Clienți (vezi docs/WEB.md).
+# Netlify recunoaște Next.js singur și folosește adaptorul lui; aici doar comanda de build.
+[build]
+  command = "npm run web:build"
+  publish = ".next"
+
+[build.environment]
+  CRM_MODE = "web"
+  NODE_VERSION = "22"
+  # build-ul Windows (installer-ul Electron) nu e necesar aici
+  ELECTRON_SKIP_BINARY_DOWNLOAD = "1"

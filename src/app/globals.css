@@ -4,16 +4,143 @@
 
 :root {
   color-scheme: dark;
+  /* Paleta CRM-ului (programul de Windows): albastru închis clasic, turcoaz, auriu.
+     Valori „R G B”, ca Tailwind să poată adăuga transparența (bg-navy/95). */
+  --c-navy: 10 24 40;
+  --c-navy-900: 12 29 48;
+  --c-navy-850: 13 31 51;
+  --c-navy-800: 15 34 54;
+  --c-navy-700: 20 48 74;
+  --c-navy-600: 31 59 87;
+  --c-teal: 23 133 130;
+  --c-teal-hi: 37 167 162;
+  --c-teal-soft: 127 216 212;
+  --c-gold: 191 161 129;
+  --c-gold-hi: 215 190 152;
+  --c-ink: 232 238 243;
+  --c-ink-muted: 142 162 182;
+  --c-on-teal: 255 255 255;
+  --c-on-gold: 10 24 40;
+  --c-danger: 213 103 94;
+  --c-danger-hi: 242 164 157;
+  --c-warn: 217 164 65;
+  --c-ok: 67 180 140;
+  --c-ok-hi: 127 216 180;
+  --c-prio-b: 140 122 94;
+  --c-prio-c: 58 84 112;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --font-display: "Archivo";
+  --font-body: "Instrument Sans";
+}
+
+/* -----------------------------------------------------------------------------
+   Versiunea web, inclusă în site (twopixeldev.com/app/ → Clienți): aceeași temă ca
+   aplicația site-ului — gri-negru, cyan, violet și magenta, JetBrains Mono + Unbounded,
+   colțuri rotunjite mari. Tema închisă/deschisă urmează alegerea din site (data-theme).
+   ----------------------------------------------------------------------------- */
+html[data-skin="site"] {
+  --c-navy: 18 20 25;
+  --c-navy-900: 13 15 19;
+  --c-navy-850: 21 24 30;
+  --c-navy-800: 27 31 39;
+  --c-navy-700: 35 40 51;
+  --c-navy-600: 46 52 66;
+  --c-teal: 0 240 255;
+  --c-teal-hi: 110 246 255;
+  --c-teal-soft: 0 240 255;
+  --c-gold: 143 123 255;
+  --c-gold-hi: 178 165 255;
+  --c-ink: 244 247 250;
+  --c-ink-muted: 163 172 189;
+  --c-on-teal: 6 16 20;
+  --c-on-gold: 6 16 20;
+  --c-danger: 255 42 109;
+  --c-danger-hi: 255 122 160;
+  --c-warn: 255 195 90;
+  --c-ok: 62 224 168;
+  --c-ok-hi: 62 224 168;
+  --c-prio-b: 98 86 168;
+  --c-prio-c: 70 78 96;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --font-display: "Unbounded";
+  --font-body: "JetBrains Mono";
+  --st-nou: #6f7889;
+  --st-de-verificat: #8f7bff;
+  --st-contactat: #00b8d9;
+  --st-interesat: #00f0ff;
+  --st-demo-programat: #3ee0a8;
+  --st-oferta-trimisa: #c8f560;
+  --st-negociere: #ffc35a;
+  --st-castigat: #3ee0a8;
+  --st-pierdut: #ff2a6d;
+  --st-revino-mai-tarziu: #a3acbd;
+}
+html[data-skin="site"][data-theme="light"] {
+  color-scheme: light;
+  --c-navy: 232 235 240;
+  --c-navy-900: 238 241 245;
+  --c-navy-850: 226 230 236;
+  --c-navy-800: 220 225 232;
+  --c-navy-700: 246 248 251;
+  --c-navy-600: 196 203 215;
+  --c-teal: 0 140 152;
+  --c-teal-hi: 0 162 173;
+  --c-teal-soft: 0 120 130;
+  --c-gold: 108 85 242;
+  --c-gold-hi: 84 62 214;
+  --c-ink: 13 15 20;
+  --c-ink-muted: 74 82 99;
+  --c-on-teal: 255 255 255;
+  --c-on-gold: 255 255 255;
+  --c-danger: 232 0 76;
+  --c-danger-hi: 200 0 66;
+  --c-warn: 176 116 0;
+  --c-ok: 15 168 120;
+  --c-ok-hi: 10 130 92;
+  --c-prio-b: 160 148 240;
+  --c-prio-c: 180 188 202;
+  --st-nou: #7a8396;
+  --st-de-verificat: #6c55f2;
+  --st-contactat: #0083a8;
+  --st-interesat: #00a2ad;
+  --st-demo-programat: #0fa878;
+  --st-oferta-trimisa: #6f9d00;
+  --st-negociere: #d08a00;
+  --st-castigat: #0fa878;
+  --st-pierdut: #e8004c;
+  --st-revino-mai-tarziu: #4a5263;
+}
+html[data-skin="site"] body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(0, 240, 255, 0.07), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(255, 42, 109, 0.06), transparent 60%),
+    rgb(var(--c-navy));
+  background-attachment: fixed;
+}
+html[data-skin="site"][data-theme="light"] body {
+  background:
+    radial-gradient(1200px 600px at 85% -10%, rgba(0, 162, 173, 0.1), transparent 60%),
+    radial-gradient(900px 500px at -10% 110%, rgba(232, 0, 76, 0.06), transparent 60%),
+    rgb(var(--c-navy));
+}
+/* titlurile în Unbounded sunt late: puțin mai mici și mai aerisite decât în Archivo */
+html[data-skin="site"] .font-display {
+  font-weight: 600 !important;
+  letter-spacing: -0.01em;
 }
 
 html,
 body {
-  background: #0a1828;
-  color: #e8eef3;
+  background: rgb(var(--c-navy));
+  color: rgb(var(--c-ink));
 }
 
 body {
-  font-family: "Instrument Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body), "Segoe UI", system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 

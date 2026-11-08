@@ -25,7 +25,7 @@ export function OptOutControl({ leadId, active, canEdit }: { leadId: string; act
       <Input id="optout-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Motiv (opțional), ex. a cerut la telefon" className="h-10 w-80 max-w-full" />
       <Button size="sm" variant="danger" disabled={pending} onClick={() => run(true)}>Confirmă</Button>
       <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>Renunță</Button>
-      {msg && <span role="alert" className="text-xs text-[#F2A49D]">{msg}</span>}
+      {msg && <span role="alert" className="text-xs text-danger-hi">{msg}</span>}
     </div>
   ) : (
     <Button size="sm" variant="danger" onClick={() => setOpen(true)}><Ban size={13} />Nu mai contacta</Button>

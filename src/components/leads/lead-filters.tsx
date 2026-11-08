@@ -93,7 +93,7 @@ function FilterDropdown({ id, label, count, open, onOpenChange, children, wide }
       >
         {label}
         {active && (
-          <span className="tabular rounded-full bg-teal px-1.5 text-[13px] leading-5 text-white" aria-label={`${count} ${count === 1 ? "selectat" : "selectate"}`}>
+          <span className="tabular rounded-full bg-teal px-1.5 text-[13px] leading-5 text-on-teal" aria-label={`${count} ${count === 1 ? "selectat" : "selectate"}`}>
             {count}
           </span>
         )}
@@ -134,7 +134,7 @@ function OptionItem({ checked, onClick, children }: { checked: boolean; onClick:
         aria-hidden
         className={cn(
           "flex size-[18px] shrink-0 items-center justify-center rounded border",
-          checked ? "border-teal bg-teal text-white" : "border-navy-600 bg-navy",
+          checked ? "border-teal bg-teal text-on-teal" : "border-navy-600 bg-navy",
         )}
       >
         {checked && <Check size={13} strokeWidth={3} />}

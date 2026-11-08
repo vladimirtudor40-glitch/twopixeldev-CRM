@@ -35,7 +35,7 @@ export default async function UsersPage() {
               <li key={u.id}>
                 <details className="group rounded-lg border border-navy-600 bg-navy">
                   <summary className="flex cursor-pointer list-none flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5 [&::-webkit-details-marker]:hidden">
-                    <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold", u.active ? "bg-gold text-navy" : "bg-navy-700 text-ink-muted")}>
+                    <span className={cn("grid h-10 w-10 shrink-0 place-items-center rounded-full text-xs font-bold", u.active ? "bg-gold text-on-gold" : "bg-navy-700 text-ink-muted")}>
                       {(u.name || u.email).slice(0, 1).toUpperCase()}
                     </span>
                     <span className="min-w-0 flex-1">
@@ -48,7 +48,7 @@ export default async function UsersPage() {
                     <span className={cn("rounded-full border px-2 py-0.5 text-[15px] font-semibold", u.role === "ADMIN" ? "border-gold/50 text-gold" : "border-teal/50 text-teal-hi")}>
                       {ROLE_LABEL[u.role]}
                     </span>
-                    {!u.active && <span className="rounded-full border border-danger/50 px-2 py-0.5 text-[15px] font-semibold text-[#F2A49D]">Dezactivat</span>}
+                    {!u.active && <span className="rounded-full border border-danger/50 px-2 py-0.5 text-[15px] font-semibold text-danger-hi">Dezactivat</span>}
                     <span className="w-full text-[15px] text-ink-muted sm:w-auto">
                       {u._count.ownedLeads} lead-uri · ultima autentificare: {u.lastLoginAt ? formatDateTime(u.lastLoginAt) : "niciodată"}
                     </span>
