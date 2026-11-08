@@ -15,7 +15,7 @@ desktop/app/package.json
 data/import/*
 !data/import/.gitkeep
 
-# Versiunea web (Cloudflare): build-ul OpenNext și fișierele locale Wrangler
-.open-next
-.wrangler
-.dev.vars
+
+# Versiunea web (Netlify): schema temporară din scripts/web.mjs și fișierele locale Netlify
+prisma/schema.web.prisma
+.netlify

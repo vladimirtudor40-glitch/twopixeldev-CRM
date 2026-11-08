@@ -10,7 +10,9 @@ const desktopAuth = NextAuth(authConfig).auth;
  * (vezi src/lib/web.ts). Nu există pagină de login proprie, nici API-ul Auth.js.
  */
 function webGate(req: NextRequest) {
-  if (!proxiedEmail(req.headers)) {
+  // Dacă middleware-ul (funcție edge pe Netlify) nu vede secretul, verificarea rămâne doar pe server:
+  // requireUser() și fiecare acțiune refuză oricum o cerere fără secretul corect (src/server/session.ts).
+  if (process.env.CRM_PROXY_SECRET && !proxiedEmail(req.headers)) {
     return new NextResponse("Neautorizat", { status: 401, headers: { "cache-control": "no-store" } });
   }
   if (req.nextUrl.pathname === "/login") return NextResponse.redirect(new URL("/", req.nextUrl));
