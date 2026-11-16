@@ -33,6 +33,7 @@ export type LeadImportData = {
   osmId?: string;
   operatorName?: string;
   operatorCui?: string;
+  ratingGoogle?: number;
   inMinistryList?: boolean;
   source?: LeadSource;
   priority?: Priority;
@@ -165,6 +166,10 @@ export const TARGET_FIELDS: TargetField[] = [
   { key: "instagramUrl", label: "Link Instagram", aliases: ["instagram", "link instagram"], apply: (v, o) => { o.instagramUrl = normalizeUrl(v) ?? undefined; } },
   { key: "manualCheckNote", label: "Verificare manuală", aliases: ["verificare manuala", "de verificat", "nota verificare"], apply: (v, o) => { o.manualCheckNote = str(v) || undefined; } },
   { key: "googleMapsUrl", label: "Link Google Maps", aliases: ["cauta pe google maps", "google maps", "link google maps"], apply: (v, o) => { o.googleMapsUrl = normalizeUrl(v) ?? undefined; } },
+  {
+    key: "ratingGoogle", label: "Rating Google", aliases: ["rating google", "rating", "nota google"],
+    apply: (v, o) => { const n = parseNumber(v); if (n !== null && n >= 1 && n <= 5) o.ratingGoogle = Math.round(n * 10) / 10; },
+  },
   { key: "starsOsm", label: "Stele (OSM)", aliases: ["stele osm", "stele"], apply: (v, o) => { const n = parseIntLoose(v); if (n !== null && n >= 0 && n <= 5) o.starsOsm = n; } },
   { key: "categoryMinistry", label: "Categorie (minister)", aliases: ["categorie minister", "categorie", "clasificare"], apply: (v, o) => { o.categoryMinistry = str(v) || undefined; } },
   {

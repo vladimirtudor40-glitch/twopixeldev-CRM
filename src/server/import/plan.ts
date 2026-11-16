@@ -10,7 +10,7 @@ export const FILLABLE_KEYS = [
   "type", "businessType", "address", "latitude", "longitude", "phone", "phoneNormalized", "email", "starsOsm",
   "categoryMinistry", "roomsCount", "placesCount", "websiteStatus", "websiteUrl", "bookingUrl",
   "facebookUrl", "instagramUrl", "otherLinks", "googleMapsUrl", "osmUrl", "osmId", "operatorName",
-  "operatorCui", "inMinistryList", "manualCheckNote",
+  "operatorCui", "ratingGoogle", "inMinistryList", "manualCheckNote",
 ] as const;
 export type FillableKey = (typeof FILLABLE_KEYS)[number];
 

@@ -49,6 +49,32 @@ jobs:
           printf '%s' "$LEADURI_ALTE_CATEGORII" | base64 -d | gunzip > data/import/leaduri_litoral_alte_categorii.csv
           echo "Lead-uri pentru import: $(($(wc -l < data/import/leaduri_litoral_alte_categorii.csv) - 1)) rânduri"
 
+      # „Caută lead-uri”: gmaps-scraper.exe compilat din sursă (vezi scripts/build-gmaps-scraper.sh).
+      # Binarul nu stă în repo; îl păstrăm în cache cât timp scriptul nu se schimbă.
+      - name: Cache gmaps-scraper
+        id: gmaps-cache
+        uses: actions/cache@v4
+        with:
+          path: dist-desktop/gmaps/gmaps-scraper.exe
+          key: gmaps-scraper-${{ hashFiles('scripts/build-gmaps-scraper.sh') }}
+
+      - uses: actions/setup-go@v5
+        if: steps.gmaps-cache.outputs.cache-hit != 'true'
+        with:
+          go-version: stable
+          cache: false
+
+      - name: Compilează gmaps-scraper
+        if: steps.gmaps-cache.outputs.cache-hit != 'true'
+        shell: bash
+        env:
+          GOTOOLCHAIN: auto
+        run: scripts/build-gmaps-scraper.sh dist-desktop/gmaps/gmaps-scraper.exe windows amd64
+
+      - name: Verifică gmaps-scraper
+        shell: bash
+        run: test -s dist-desktop/gmaps/gmaps-scraper.exe && ls -la dist-desktop/gmaps
+
       - name: Construiește installer-ul
         run: npm run desktop:dist
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Search, Upload } from "lucide-react";
 import { LeadWorkspace } from "@/components/leads/lead-tabs";
 import { buttonClass } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
@@ -16,6 +16,7 @@ export default async function LeadsLayout({ children }: { children: React.ReactN
         actions={
           <>
             {user.role === "ADMIN" && <Link href="/import" className={buttonClass("secondary")}><Upload size={15} />Import</Link>}
+            <Link href="/cauta-leaduri" className={buttonClass("gold")}><Search size={15} />Caută lead-uri</Link>
             <Link href="/leaduri/nou" className={buttonClass("primary")}><Plus size={15} />Lead nou</Link>
           </>
         }

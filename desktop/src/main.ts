@@ -265,6 +265,15 @@ function buildMenu(): void {
         { label: "Reîncarcă", accelerator: "CmdOrCtrl+R", click: () => getWindow().webContents.reload() },
         { type: "separator" },
         {
+          label: "Caută lead-uri...",
+          accelerator: "CmdOrCtrl+L",
+          click: () => {
+            const url = serverUrl();
+            if (url) void getWindow().loadURL(`${url}/cauta-leaduri`);
+            else void boot();
+          },
+        },
+        {
           // Același ecran ca fostul buton „Import” din meniul lateral (doar pentru administratori).
           label: "Importă...",
           accelerator: "CmdOrCtrl+I",

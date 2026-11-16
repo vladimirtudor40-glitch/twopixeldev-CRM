@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ChevronDown, LayoutDashboard, Layers, List, Upload, Users } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Layers, List, Search, Upload, Users } from "lucide-react";
 import { categoryHref, LEAD_CATEGORIES } from "@/lib/categories";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
   { href: "/", label: "Panou", icon: LayoutDashboard, exact: true },
   { href: "/leaduri", label: "Lead-uri", icon: List },
+  // Căutarea pe Google Maps (fosta aplicație separată „twopixeldev Leaduri”); pe mobil nu apare în bara de jos.
+  { href: "/cauta-leaduri", label: "Caută lead-uri", icon: Search, bottom: false },
   // Import nu apare în meniul lateral: pe desktop e în Fișier → Importă..., pe mobil în bara de jos.
   { href: "/import", label: "Import", icon: Upload, adminOnly: true, sidebar: false },
   { href: "/utilizatori", label: "Utilizatori", icon: Users, adminOnly: true },
@@ -103,7 +105,7 @@ export function SideNav({ isAdmin }: { isAdmin: boolean }) {
 
 export function BottomNav({ isAdmin }: { isAdmin: boolean }) {
   const path = usePathname();
-  const items = ITEMS.filter((i) => !i.adminOnly || isAdmin);
+  const items = ITEMS.filter((i) => (!i.adminOnly || isAdmin) && i.bottom !== false);
   return (
     <nav
       aria-label="Navigare"
