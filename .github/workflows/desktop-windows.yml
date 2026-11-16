@@ -81,7 +81,10 @@ jobs:
       # Publică installer-ul + latest.yml în GitHub Releases, ca „v<version din package.json>”.
       # Programul instalat își ia de acolo singur actualizările. O versiune nouă cere creșterea
       # „version” în package.json; la același număr, fișierele Release-ului sunt înlocuite.
+      # Doar de pe main / desktop-windows: o rulare manuală pe alt branch construiește installer-ul
+      # pentru test (artifact), fără să publice o actualizare pentru programele instalate.
       - name: Publică versiunea în Releases
+        if: github.ref == 'refs/heads/desktop-windows' || github.ref == 'refs/heads/main'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
