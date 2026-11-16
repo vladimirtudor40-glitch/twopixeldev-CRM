@@ -77,8 +77,8 @@ describe("planImport", () => {
 
   it("creează, completează și recunoaște duplicatele", () => {
     const existing: ExistingLead[] = [
-      { id: "L1", osmId: "node/1", nameNormalized: "maria", zone: "EFORIE_NORD", phoneNormalized: null, values: { email: "x@y.ro" } },
-      { id: "L2", osmId: null, nameNormalized: "ciresica", zone: "MAMAIA", phoneNormalized: "0341103874", values: { address: "Str. 1", phoneNormalized: "0341103874" } },
+      { id: "L1", osmId: "node/1", category: "HOTELURI", nameNormalized: "maria", zone: "EFORIE_NORD", phoneNormalized: null, values: { email: "x@y.ro" } },
+      { id: "L2", osmId: null, category: "HOTELURI", nameNormalized: "ciresica", zone: "MAMAIA", phoneNormalized: "0341103874", values: { address: "Str. 1", phoneNormalized: "0341103874" } },
     ];
     const plan = planImport({
       columnMap: map, existing, newId,
@@ -122,9 +122,36 @@ describe("planImport", () => {
     ];
     const first = planImport({ columnMap: map, existing: [], newId, rows });
     const existing: ExistingLead[] = [...first.creates.entries()].map(([id, d]) => ({
-      id, osmId: d.osmId ?? null, nameNormalized: d.nameNormalized, zone: d.zone, phoneNormalized: d.phoneNormalized ?? null, values: { ...d },
+      id, osmId: d.osmId ?? null, category: d.category, nameNormalized: d.nameNormalized, zone: d.zone, phoneNormalized: d.phoneNormalized ?? null, values: { ...d },
     }));
     const second = planImport({ columnMap: map, existing, newId, rows });
     expect(second.summary).toMatchObject({ create: 0, update: 0, unchanged: 2 });
+  });
+
+  it("„Categorie lead” pune lead-ul în categoria lui, păstrează tipul liber și nu-l unește cu hotelul omonim", () => {
+    const headers = [...HEADERS, "Categorie lead"];
+    const m = autoDetectColumnMap(headers);
+    expect(m["Categorie lead"]).toBe("category");
+    expect(m["Categorie (minister)"]).toBe("categoryMinistry");
+    const existing: ExistingLead[] = [
+      { id: "H1", osmId: null, category: "HOTELURI", nameNormalized: "dobrogea", zone: "MAMAIA", phoneNormalized: "0722000003", values: {} },
+    ];
+    const plan = planImport({
+      columnMap: m, existing, newId,
+      rows: [
+        { rowNumber: 2, raw: { ...row({ Nume: "Hotel Dobrogea", Zona: "Mamaia", Telefon: "0722000003", Tip: "Restaurant" }), "Categorie lead": "Restaurante" } },
+        { rowNumber: 3, raw: { ...row({ Nume: "Fresh Cut", Zona: "Constanta", Tip: "Barbershop" }), "Categorie lead": "Barbershopuri" } },
+        { rowNumber: 4, raw: { ...row({ Nume: "Studio Bella", Zona: "Constanta", Tip: "Salon infrumusetare" }), "Categorie lead": "Saloane beauty" } },
+        { rowNumber: 5, raw: { ...row({ Nume: "Aqua Magic", Zona: "Mamaia", Tip: "Aquapark" }), "Categorie lead": "Activități" } },
+        { rowNumber: 6, raw: { ...row({ Nume: "Vila Nouă", Zona: "Agigea", Tip: "Pensiune" }), "Categorie lead": "" } },
+      ],
+    });
+    const created = plan.rows.map((r) => plan.creates.get(r.leadId ?? ""));
+    expect(plan.summary.create).toBe(5);
+    expect(created.map((d) => d?.category)).toEqual(["RESTAURANTE", "BARBERSHOPURI", "SALOANE_BEAUTY", "ACTIVITATI", "HOTELURI"]);
+    expect(created[0]).toMatchObject({ businessType: "Restaurant" });
+    expect(created[0]).not.toHaveProperty("type");
+    expect(created[4]).toMatchObject({ type: "PENSIUNE_VILA" });
+    expect(created[4]).not.toHaveProperty("businessType");
   });
 });

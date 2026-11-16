@@ -14,6 +14,16 @@ const config: Config = {
         warn: "#D9A441",
         ok: "#43B48C",
       },
+      // Mărimile de text sunt cu 4 px peste cele standard Tailwind (cerința lui Vladimir, 2026-11-06)
+      fontSize: {
+        xs: ["16px", { lineHeight: "22px" }],
+        sm: ["18px", { lineHeight: "26px" }],
+        base: ["20px", { lineHeight: "28px" }],
+        lg: ["22px", { lineHeight: "30px" }],
+        xl: ["24px", { lineHeight: "32px" }],
+        "2xl": ["28px", { lineHeight: "36px" }],
+        "3xl": ["34px", { lineHeight: "40px" }],
+      },
       fontFamily: {
         display: ["Archivo", "Segoe UI", "system-ui", "sans-serif"],
         sans: ["Instrument Sans", "Segoe UI", "system-ui", "-apple-system", "sans-serif"],

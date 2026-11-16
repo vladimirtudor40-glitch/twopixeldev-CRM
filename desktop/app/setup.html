@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; script-src 'self'" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>twopixeldev CRM · Conectare</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <img class="logo" src="logo.png" alt="twopixeldev" />
+    <h1>Conectare la baza de date</h1>
+    <p class="lead">Datele CRM-ului stau online, în Supabase, ca să lucrezi de pe orice laptop și împreună cu colegii.</p>
+
+    <div id="notice" class="msg info hidden"></div>
+
+    <section class="card">
+      <h2>1. Adresa bazei de date</h2>
+      <ol class="steps">
+        <li>Deschide proiectul în <b>Supabase</b> și apasă butonul <b>Connect</b> (sus, în pagină).</li>
+        <li>La „Connection string” alege <b>Session pooler</b> și copiază adresa (URI).</li>
+        <li>Lipește-o mai jos și înlocuiește <b>[YOUR-PASSWORD]</b> cu parola bazei de date.</li>
+      </ol>
+      <label for="url">Connection string</label>
+      <div class="row">
+        <input id="url" type="password" autocomplete="off" spellcheck="false"
+          placeholder="postgresql://postgres.xxxx:PAROLA@aws-0-eu-central-1.pooler.supabase.com:5432/postgres" />
+        <button id="toggle" type="button" class="secondary" title="Arată / ascunde">Arată</button>
+      </div>
+      <div id="current" class="hint hidden"></div>
+      <div class="actions">
+        <button id="test" type="button" class="secondary">Verifică conexiunea</button>
+      </div>
+      <div id="testResult" class="msg hidden"></div>
+    </section>
+
+    <section id="adminCard" class="card hidden">
+      <h2>2. Contul tău de administrator</h2>
+      <p class="hint" style="margin-top:0">Baza de date e nouă. Creează primul cont; colegii vor fi adăugați apoi din aplicație.</p>
+      <div class="grid">
+        <div>
+          <label for="name">Nume</label>
+          <input id="name" autocomplete="name" />
+        </div>
+        <div>
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" />
+        </div>
+        <div>
+          <label for="pass">Parolă (minim 10 caractere)</label>
+          <input id="pass" type="password" autocomplete="new-password" />
+        </div>
+        <div>
+          <label for="pass2">Confirmă parola</label>
+          <input id="pass2" type="password" autocomplete="new-password" />
+        </div>
+      </div>
+    </section>
+
+    <div id="saveError" class="msg err hidden"></div>
+    <div class="actions">
+      <button id="cancel" type="button" class="secondary hidden">Înapoi la aplicație</button>
+      <button id="save" type="button" class="gold" disabled>Salvează și pornește</button>
+    </div>
+    <div id="log" class="log"></div>
+    <div id="version" class="version"></div>
+  </main>
+  <script src="setup.js"></script>
+</body>
+</html>

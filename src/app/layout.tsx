@@ -1,4 +1,13 @@
 import type { Metadata, Viewport } from "next";
+// Fonturile vin din pachetul programului, nu de la Google la fiecare deschidere de pagină:
+// fără internet sau cu internet lent, pagina nu mai așteaptă după fonts.googleapis.com.
+import "@fontsource/archivo/600.css";
+import "@fontsource/archivo/700.css";
+import "@fontsource/archivo/800.css";
+import "@fontsource/instrument-sans/400.css";
+import "@fontsource/instrument-sans/500.css";
+import "@fontsource/instrument-sans/600.css";
+import "@fontsource/instrument-sans/700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -12,15 +21,6 @@ export const viewport: Viewport = { themeColor: "#0A1828", width: "device-width"
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ro">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap"
-        />
-      </head>
       <body className="min-h-dvh bg-navy text-ink">{children}</body>
     </html>
   );

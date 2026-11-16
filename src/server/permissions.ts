@@ -14,3 +14,4 @@ export function canAssignOwner(user: SessionUser, lead: { ownerId: string | null
 
 export const canImport = (user: SessionUser) => user.role === "ADMIN";
 export const canArchive = (user: SessionUser) => user.role === "ADMIN";
+export const canManageUsers = (user: SessionUser) => user.role === "ADMIN";

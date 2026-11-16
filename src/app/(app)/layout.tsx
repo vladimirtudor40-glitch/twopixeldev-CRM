@@ -11,18 +11,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const isAdmin = user.role === "ADMIN";
   const initials = (user.name || user.email || "?").split(/[\s@.]/).filter(Boolean).slice(0, 2).map((x) => x[0]!.toUpperCase()).join("");
   return (
-    <div className="md:grid md:min-h-dvh md:grid-cols-[232px_minmax(0,1fr)]">
+    <div className="md:grid md:min-h-dvh md:grid-cols-[270px_minmax(0,1fr)]">
       <aside className="sticky top-0 hidden h-dvh flex-col gap-6 border-r border-navy-600 bg-gradient-to-b from-[#0C1D30] to-navy px-3.5 py-5 md:flex">
         <Link href="/" className="block px-1">
           <Image src="/brand/twopixeldev-logo.png" alt="twopixeldev" width={170} height={24} priority className="h-auto w-[170px]" />
-          <span className="mt-1.5 block text-[11px] font-semibold uppercase tracking-[0.18em] text-gold">CRM vânzări</span>
+          <span className="mt-1.5 block text-[15px] font-semibold uppercase tracking-[0.18em] text-gold">CRM vânzări</span>
         </Link>
         <SideNav isAdmin={isAdmin} />
         <div className="mt-auto flex items-center gap-2.5 border-t border-navy-600 pt-3.5 text-sm">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gold text-xs font-bold text-navy">{initials}</span>
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gold text-xs font-bold text-navy">{initials}</span>
           <div className="min-w-0 flex-1">
             <div className="truncate">{user.name || user.email}</div>
-            <div className="text-[11px] text-ink-muted">{ROLE_LABEL[user.role]}</div>
+            <div className="text-[15px] text-ink-muted">{ROLE_LABEL[user.role]}</div>
           </div>
           <form action={logoutAction}>
             <button type="submit" title="Ieși din cont" aria-label="Ieși din cont" className="rounded-md p-1.5 text-ink-muted hover:bg-navy-800 hover:text-ink">
