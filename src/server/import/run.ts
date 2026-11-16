@@ -18,6 +18,18 @@ export async function createImportBatch(
   if (!parsed.headers.length || !parsed.rows.length) {
     throw new Error("Fișierul nu are rânduri cu date. Verifică foaia aleasă și antetul.");
   }
+  return createImportBatchFromRows(db, { ...args, ...parsed });
+}
+
+/** Ca createImportBatch, dar cu rândurile deja citite (ex. rezultatele căutării pe Google Maps). */
+export async function createImportBatchFromRows(
+  db: PrismaClient,
+  args: {
+    fileName: string; userId: string | null; id?: string; sheetName?: string | null; sheetNames?: string[];
+    headers: string[]; rows: { rowNumber: number; raw: Record<string, string> }[];
+  },
+) {
+  const parsed = { sheetName: args.sheetName ?? null, sheetNames: args.sheetNames ?? [], headers: args.headers, rows: args.rows };
   const columnMap = autoDetectColumnMap(parsed.headers);
   const batch = await db.importBatch.create({
     data: {
@@ -123,6 +135,7 @@ function toCreateInput(
     osmId: d.osmId ?? null,
     operatorName: d.operatorName ?? null,
     operatorCui: d.operatorCui ?? null,
+    ratingGoogle: d.ratingGoogle ?? null,
     inMinistryList: d.inMinistryList ?? false,
     source: d.source ?? "MANUAL",
     priority: d.priority ?? "B",

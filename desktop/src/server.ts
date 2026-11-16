@@ -2,13 +2,13 @@
  * Pornește serverul Next.js (build „standalone”) ca proces separat, doar pe 127.0.0.1,
  * folosind Node-ul inclus în Electron (ELECTRON_RUN_AS_NODE).
  */
-import { fork, type ChildProcess } from "node:child_process";
+import { fork, spawnSync, type ChildProcess } from "node:child_process";
 import fs from "node:fs";
 import http from "node:http";
 import net from "node:net";
 import path from "node:path";
 import type { AppConfig } from "./config";
-import { logsDir, serverEntry } from "./paths";
+import { gmapsScraper, leadSearchDir, leadSearchWorkDir, logsDir, serverEntry } from "./paths";
 
 const MAX_LOG_BYTES = 5 * 1024 * 1024;
 
@@ -82,6 +82,10 @@ export async function startServer(config: AppConfig): Promise<string> {
     AUTH_SECRET: config.authSecret,
     AUTH_URL: base,
     AUTH_TRUST_HOST: "true",
+    // „Caută lead-uri”: același folder de rezultate ca aplicația separată „twopixeldev Leaduri”
+    TPD_GMAPS_SCRAPER: process.env.TPD_GMAPS_SCRAPER || gmapsScraper(),
+    TPD_LEADURI_DIR: process.env.TPD_LEADURI_DIR || leadSearchDir(),
+    TPD_GMAPS_WORKDIR: leadSearchWorkDir(),
   };
 
   const proc = fork(entry, [], {
@@ -131,6 +135,10 @@ export function stopServer(): Promise<void> {
       clearTimeout(timer);
       resolve();
     });
+    // Pe Windows oprim tot arborele: și o căutare de lead-uri pornită de server (scraper + browserul lui).
+    if (process.platform === "win32" && proc.pid) {
+      spawnSync("taskkill", ["/T", "/F", "/PID", String(proc.pid)], { windowsHide: true });
+    }
     proc.kill();
   });
 }
